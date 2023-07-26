@@ -729,11 +729,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b9a305e18de0c04dbd257a21cd47087, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  sharedProfile: {fileID: 11400000, guid: 1e331438a4c6be94cbd4442fafeccfdc, type: 2}
-  isGlobal: 1
-  blendDistance: 0
-  weight: 1
-  priority: 0
 --- !u!850595691 &1135584658
 LightingSettings:
   m_ObjectHideFlags: 0
@@ -1051,6 +1046,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: RobotBlockout
+      objectReference: {fileID: 0}
+    - target: {fileID: 2841145836486685398, guid: 7046fb367c20fa3448a4aa363c40a1fc,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 7.75
+      objectReference: {fileID: 0}
+    - target: {fileID: 2841145836486685398, guid: 7046fb367c20fa3448a4aa363c40a1fc,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -3.25
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
