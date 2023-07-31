@@ -42,12 +42,6 @@ public class WeaponHandler : NetworkBehaviour
         networkObject = GetComponent<NetworkObject>();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
     public override void FixedUpdateNetwork()
     {
         if (hpHandler.isDead)
@@ -56,7 +50,7 @@ public class WeaponHandler : NetworkBehaviour
         //Get the input from the network
         if (GetInput(out NetworkInputData networkInputData))
         {
-            if (networkInputData.isFireButtonPressed)
+            if (networkInputData.isFireButtonPressed && !networkInputData.isInteractModePressed)
                 Fire(networkInputData.aimForwardVector);
 
             if (networkInputData.isGrenadeFireButtonPressed)
@@ -88,7 +82,10 @@ public class WeaponHandler : NetworkBehaviour
             Debug.Log($"{Time.time} {transform.name} hit hitbox {hitinfo.Hitbox.transform.root.name}");
 
             if (Object.HasStateAuthority)
-                hitinfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage(networkPlayer.nickName.ToString(), 1);
+                if (hitinfo.Hitbox.transform.root.GetComponent<HPHandler>() != null)
+                {
+                    hitinfo.Hitbox.transform.root.GetComponent<HPHandler>().OnTakeDamage(networkPlayer.nickName.ToString(), 1);
+                }
 
             isHitOtherPlayer = true;
 
