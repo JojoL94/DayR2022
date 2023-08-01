@@ -1,14 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
+using Fusion;
+using UnityEngine.UI;
 
-public class RobotInteractableHandler : MonoBehaviour
+public class RobotInteractableHandler : NetworkBehaviour
 {
-    public Transform doorHitbox;
+    public Transform doorButtonHitbox;
     public Transform door;
-    public Transform startMarker;
-    public Transform endMarker;
+    public Transform closedMarker;
+    public Transform openMarker;
 
     private float dist;
     private bool doorOpenProcess = false;
@@ -17,6 +18,7 @@ public class RobotInteractableHandler : MonoBehaviour
     private bool doorClosed = true;
     // Movement speed in units per second.
     public float speed = 1.0F;
+    
     // Time when the movement started.
     private float startTime;
 
@@ -24,12 +26,12 @@ public class RobotInteractableHandler : MonoBehaviour
     private float journeyLength;
 
     // Update is called once per frame
-    void Update()
+    public override void FixedUpdateNetwork()
     {
-        if (doorHitbox.CompareTag("ProcessQueue") && doorClosed)
+        if (doorButtonHitbox.CompareTag("ProcessQueue") && doorClosed)
         {
             OpenDoor();
-        } else if (doorHitbox.CompareTag("ProcessQueue") && doorOpen)
+        } else if (doorButtonHitbox.CompareTag("ProcessQueue") && doorOpen)
         {
             CloseDoor();
         }
@@ -44,11 +46,11 @@ public class RobotInteractableHandler : MonoBehaviour
             float fractionOfJourney = distCovered / journeyLength;
 
             // Set our position as a fraction of the distance between the markers.
-            door.transform.position = Vector3.Lerp(startMarker.position, endMarker.position, fractionOfJourney);
-            dist = Vector3.Distance(door.position, endMarker.position);
+            door.transform.position = Vector3.Lerp(closedMarker.position, openMarker.position, fractionOfJourney);
+            dist = Vector3.Distance(door.position, openMarker.position);
             if ( dist < 0.1f)
             {
-                doorHitbox.tag = "Untagged";
+                doorButtonHitbox.tag = "Untagged";
                 doorOpen = true;
                 doorOpenProcess = false;
                 
@@ -64,11 +66,11 @@ public class RobotInteractableHandler : MonoBehaviour
             float fractionOfJourney = distCovered / journeyLength;
 
             // Set our position as a fraction of the distance between the markers.
-            door.transform.position = Vector3.Lerp(endMarker.position, startMarker.position, fractionOfJourney);
-            dist = Vector3.Distance(door.position, startMarker.position);
+            door.transform.position = Vector3.Lerp(openMarker.position, closedMarker.position, fractionOfJourney);
+            dist = Vector3.Distance(door.position, closedMarker.position);
             if ( dist < 0.1f)
             {
-                doorHitbox.tag = "Untagged";
+                doorButtonHitbox.tag = "Untagged";
                 doorClosed = true;
                 doorCloseProcess = false;
             }
@@ -86,7 +88,7 @@ public class RobotInteractableHandler : MonoBehaviour
         startTime = Time.time;
 
         // Calculate the journey length.
-        journeyLength = Vector3.Distance(startMarker.position, endMarker.position);
+        journeyLength = Vector3.Distance(closedMarker.position, openMarker.position);
         doorOpenProcess = true;
         }
     }
@@ -100,7 +102,7 @@ public class RobotInteractableHandler : MonoBehaviour
             startTime = Time.time;
 
             // Calculate the journey length.
-            journeyLength = Vector3.Distance(endMarker.position, startMarker.position);
+            journeyLength = Vector3.Distance(openMarker.position, closedMarker.position);
             doorCloseProcess = true;
         }
     }
