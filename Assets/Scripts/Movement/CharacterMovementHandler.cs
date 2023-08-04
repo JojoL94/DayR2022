@@ -15,6 +15,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     //Other components
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
     HPHandler hpHandler;
+    LegTargetHandler legtargetHandler;
     NetworkInGameMessages networkInGameMessages;
     NetworkPlayer networkPlayer;
 
