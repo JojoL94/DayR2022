@@ -8,8 +8,7 @@ using UnityEngine.UI;
 
 public class ReadyUIHandler : NetworkBehaviour
 {
-    [Header("UI")]
-    public TextMeshProUGUI buttonReadyText;
+    [Header("UI")] public TextMeshProUGUI buttonReadyText;
     public TextMeshProUGUI countDownText;
 
     bool isReady = false;
@@ -43,7 +42,8 @@ public class ReadyUIHandler : NetworkBehaviour
             lerpSpeed = 0.5f;
         }
 
-        Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, desiredCameraPosition, Time.deltaTime * lerpSpeed);
+        Camera.main.transform.position = Vector3.Lerp(Camera.main.transform.position, desiredCameraPosition,
+            Time.deltaTime * lerpSpeed);
 
         if (countDownTickTimer.Expired(Runner))
         {
@@ -61,8 +61,14 @@ public class ReadyUIHandler : NetworkBehaviour
     {
         //Lock the session, so no other client can join
         Runner.SessionInfo.IsOpen = false;
+        GameObject[]  gameObjectsToTransfer = GameObject.FindGameObjectsWithTag("Robot");
 
-        GameObject[] gameObjectsToTransfer = GameObject.FindGameObjectsWithTag("Player");
+        foreach (GameObject gameObjectToTransfer in gameObjectsToTransfer)
+        {
+            DontDestroyOnLoad(gameObjectToTransfer);
+        }
+        
+        gameObjectsToTransfer = GameObject.FindGameObjectsWithTag("Player");
 
         foreach (GameObject gameObjectToTransfer in gameObjectsToTransfer)
         {
@@ -71,14 +77,15 @@ public class ReadyUIHandler : NetworkBehaviour
             //Check if the player is ready
             if (!gameObjectToTransfer.GetComponent<CharacterOutfitHandler>().isDoneWithCharacterSelection)
                 Runner.Disconnect(gameObjectToTransfer.GetComponent<NetworkObject>().InputAuthority);
-
         }
+
+
 
         //Update scene for the network
         Runner.SetActiveScene("World1");
     }
 
-    public void OnChangeCharcterHead()
+    public void OnChangeCharacterHead()
     {
         if (isReady)
             return;
@@ -86,7 +93,7 @@ public class ReadyUIHandler : NetworkBehaviour
         NetworkPlayer.Local.GetComponent<CharacterOutfitHandler>().OnCycleHead();
     }
 
-    public void OnChangeCharcterBody()
+    public void OnChangeCharacterBody()
     {
         if (isReady)
             return;
@@ -94,7 +101,7 @@ public class ReadyUIHandler : NetworkBehaviour
         NetworkPlayer.Local.GetComponent<CharacterOutfitHandler>().OnCycleBody();
     }
 
-    public void OnChangeCharcterLeftArm()
+    public void OnChangeCharacterLeftArm()
     {
         if (isReady)
             return;
@@ -102,13 +109,44 @@ public class ReadyUIHandler : NetworkBehaviour
         NetworkPlayer.Local.GetComponent<CharacterOutfitHandler>().OnCycleLeftArm();
     }
 
-    public void OnChangeCharcterRightArm()
+    public void OnChangeCharacterRightArm()
     {
         if (isReady)
             return;
 
         NetworkPlayer.Local.GetComponent<CharacterOutfitHandler>().OnCycleRightArm();
+    }
+    /**************** Robot ****************/
+    public void OnChangeRobotKanone()
+    {
+        if (isReady)
+            return;
 
+        NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().OnCycleKanone();
+    }
+
+    public void OnChangeRobotHuelle()
+    {
+        if (isReady)
+            return;
+
+        NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().OnCycleHuelle();
+    }
+
+    public void OnChangeRobotInterior()
+    {
+        if (isReady)
+            return;
+
+        NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().OnCycleInterior();
+    }
+
+    public void OnChangeRobotLeg()
+    {
+        if (isReady)
+            return;
+
+        NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().OnCycleLeg();
     }
 
     public void OnReady()
@@ -132,7 +170,6 @@ public class ReadyUIHandler : NetworkBehaviour
                 countDown = 0;
             }
         }
-
         NetworkPlayer.Local.GetComponent<CharacterOutfitHandler>().OnReady(isReady);
     }
 

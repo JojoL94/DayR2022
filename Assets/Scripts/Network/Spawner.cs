@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 {
     public NetworkPlayer playerPrefab;
-
+    public NetworkObject robotPrefab;
     // Mapping between Token ID and Re-created Players
     Dictionary<int, NetworkPlayer> mapTokenIDWithNetworkPlayer;
 
@@ -23,12 +23,6 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
         mapTokenIDWithNetworkPlayer = new Dictionary<int, NetworkPlayer>();
 
         sessionListUIHandler = FindObjectOfType<SessionListUIHandler>(true);
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
     }
 
     int GetPlayerToken(NetworkRunner runner, PlayerRef player)
@@ -98,11 +92,16 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
                 }
 
                 NetworkPlayer spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+                NetworkObject spawnedRobot = runner.Spawn(robotPrefab, spawnPosition, Quaternion.identity, player);
                 spawnedNetworkPlayer.transform.position = spawnPosition;
-
+                
                 //Store the token for the player
                 spawnedNetworkPlayer.token = playerToken;
 
+                //Roboter Position
+                spawnedRobot.transform.position = spawnPosition - spawnedNetworkPlayer.transform.forward * 15;
+                spawnedNetworkPlayer.GetComponent<CharacterRobotHandler>().robot = spawnedRobot;
+                
                 //Store the mapping between playerToken and the spawned network player
                 mapTokenIDWithNetworkPlayer[playerToken] = spawnedNetworkPlayer;
             }

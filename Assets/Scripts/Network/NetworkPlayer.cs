@@ -29,13 +29,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     {
         networkInGameMessages = GetComponent<NetworkInGameMessages>();
     }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
+    
     public override void Spawned()
     {
         bool isReadyScene = SceneManager.GetActiveScene().name == "Ready";
