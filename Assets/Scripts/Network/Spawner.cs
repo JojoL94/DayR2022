@@ -90,9 +90,10 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
                     else
                         spawnPosition = new Vector3(player.PlayerId * 3, 1, 0);
                 }
-
-                NetworkPlayer spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+                
                 NetworkObject spawnedRobot = runner.Spawn(robotPrefab, spawnPosition, Quaternion.identity, player);
+                NetworkPlayer spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+
                 spawnedNetworkPlayer.transform.position = spawnPosition;
                 
                 //Store the token for the player
