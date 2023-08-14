@@ -99,16 +99,16 @@ public class CharacterRobotHandler : NetworkBehaviour
         //Replace Leg
         robotLeg = ReplaceRobotPart(robotLeg, legPrefabs[networkRobotParts.legPrefabID]);
 
-        GetComponent<HPHandler>().ResetMeshRenderers();
+        //GetComponent<HPHandler>().ResetMeshRenderers();
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     void RPC_RequestRobotPartsChange(NetworkRobotParts newNetworkRobotParts, RpcInfo info = default)
     {
         Debug.Log(
-            $"Received RPC_RequestRobotPartsChange for player {transform.name}. HeadID {newNetworkRobotParts.kanonePrefabID}");
+            $"Received RPC_RequestRobotPartsChange for robot {transform.name}. KanoneID {newNetworkRobotParts.kanonePrefabID}");
 
-        networkRobotParts = new NetworkRobotParts();
+        networkRobotParts = newNetworkRobotParts;
     }
 
 
