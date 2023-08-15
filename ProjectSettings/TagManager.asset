@@ -7,6 +7,7 @@ TagManager:
   - IgnoreLayerChange
   - ProcessQueue
   - Robot
+  - Door
   layers:
   - Default
   - TransparentFX

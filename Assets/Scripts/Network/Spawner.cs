@@ -102,6 +102,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
                 //Roboter Position
                 spawnedRobot.transform.position = spawnPosition - spawnedNetworkPlayer.transform.forward * 15;
                 spawnedNetworkPlayer.GetComponent<CharacterRobotHandler>().robot = spawnedRobot;
+                spawnedNetworkPlayer.GetComponent<RobotHandler>().robot = spawnedRobot;
                 
                 //Store the mapping between playerToken and the spawned network player
                 mapTokenIDWithNetworkPlayer[playerToken] = spawnedNetworkPlayer;

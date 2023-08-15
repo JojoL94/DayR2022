@@ -73,6 +73,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
+                GetComponent<RobotHandler>().RoboterEinrichten();
             }
 
             RPC_SetNickName(GameManager.instance.playerNickName);

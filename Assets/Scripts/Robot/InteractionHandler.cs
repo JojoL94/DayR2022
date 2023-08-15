@@ -6,18 +6,17 @@ using TMPro;
 
 public class InteractionHandler : NetworkBehaviour
 {
-    [Header("Aim")]
-    public Transform aimPoint;
-    [Header("Collision")]
-    public LayerMask collisionLayers;
+    [Header("Aim")] public Transform aimPoint;
+    [Header("Collision")] public LayerMask collisionLayers;
 
     //Other components
     HPHandler hpHandler;
     NetworkPlayer networkPlayer;
     NetworkObject networkObject;
-    
+
     [Networked(OnChanged = nameof(OnInteractChanged))]
     public bool isInteracting { get; set; }
+
     // Start is called before the first frame update
     private void Awake()
     {
@@ -38,12 +37,13 @@ public class InteractionHandler : NetworkBehaviour
                 Interact(networkInputData.aimForwardVector);
         }
     }
-    
+
     void Interact(Vector3 aimForwardVector)
     {
         Debug.Log("Try Interact");
         float hitDistance = 5;
-        Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, hitDistance, Object.InputAuthority, out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority);
+        Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, hitDistance, Object.InputAuthority,
+            out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority);
 
         bool isInteractableObject = false;
 
@@ -54,10 +54,15 @@ public class InteractionHandler : NetworkBehaviour
             Debug.Log($"{Time.time} {transform.name} hit hitbox {hitinfo.Hitbox.transform.root.name}");
 
             if (Object.HasStateAuthority)
+            {
                 isInteractableObject = true;
-            hitinfo.Hitbox.tag = "ProcessQueue";
-
+                if (hitinfo.Hitbox.tag == "Door")
+                {
+                    GetComponent<RobotHandler>().OpenCloseDoor(hitinfo.Hitbox.transform.root.transform);
+                } 
+            }
         }
+
         if (hitinfo.Collider != null)
         {
             if (Object.HasStateAuthority)
@@ -70,9 +75,8 @@ public class InteractionHandler : NetworkBehaviour
         if (isInteractableObject)
             Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.red, 1);
         else Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.green, 1);
-
     }
-    
+
     IEnumerator InteractingEffectCO()
     {
         isInteracting = true;
@@ -83,7 +87,7 @@ public class InteractionHandler : NetworkBehaviour
 
         isInteracting = false;
     }
-    
+
     static void OnInteractChanged(Changed<InteractionHandler> changed)
     {
         //Debug.Log($"{Time.time} OnFireChanged value {changed.Behaviour.isFiring}");
@@ -97,9 +101,8 @@ public class InteractionHandler : NetworkBehaviour
 
         if (isInteractingCurrent && !isInteractingOld)
             changed.Behaviour.OnInteractRemote();
-
     }
-    
+
     void OnInteractRemote()
     {
         //Mach gedöns... Animation zeug oder so
