@@ -54,7 +54,6 @@ public class CharacterRobotHandler : NetworkBehaviour
     {
         if (SceneManager.GetActiveScene().name != "Ready")
             return;
-
         robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
         robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
         robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
