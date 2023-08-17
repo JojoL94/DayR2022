@@ -9,7 +9,8 @@ using UnityEngine.SceneManagement;
 public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 {
     public NetworkPlayer playerPrefab;
-    public NetworkObject robotPrefab;
+
+    public NetworkObject robot;
     // Mapping between Token ID and Re-created Players
     Dictionary<int, NetworkPlayer> mapTokenIDWithNetworkPlayer;
 
@@ -86,24 +87,24 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
                 {
                     //Check if we are the host
                     if (runner.SessionInfo.MaxPlayers - player.PlayerId == 1)
+                    {
                         spawnPosition = new Vector3(-1 * 3, 1, 0);
+                    }
                     else
+                    {
                         spawnPosition = new Vector3(player.PlayerId * 3, 1, 0);
-                }
-                
-                NetworkObject spawnedRobot = runner.Spawn(robotPrefab, spawnPosition, Quaternion.identity, player);
-                NetworkPlayer spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+                    }
 
+                }
+                NetworkPlayer spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+                
+                NetworkObject tmpRobot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
+                spawnedNetworkPlayer.GetComponent<CharacterRobotHandler>().robot =tmpRobot;
+                spawnedNetworkPlayer.GetComponent<CharacterRobotHandler>().RoboterCustomizerEinrichten();
                 spawnedNetworkPlayer.transform.position = spawnPosition;
                 
                 //Store the token for the player
                 spawnedNetworkPlayer.token = playerToken;
-
-                //Roboter Position
-                spawnedRobot.transform.position = spawnPosition - spawnedNetworkPlayer.transform.forward * 15;
-                spawnedNetworkPlayer.GetComponent<CharacterRobotHandler>().robot = spawnedRobot;
-                spawnedNetworkPlayer.GetComponent<RobotHandler>().robot = spawnedRobot;
-                
                 //Store the mapping between playerToken and the spawned network player
                 mapTokenIDWithNetworkPlayer[playerToken] = spawnedNetworkPlayer;
             }

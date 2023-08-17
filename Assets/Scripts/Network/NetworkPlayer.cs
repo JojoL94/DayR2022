@@ -50,6 +50,8 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
+
+
             }
             else
             {

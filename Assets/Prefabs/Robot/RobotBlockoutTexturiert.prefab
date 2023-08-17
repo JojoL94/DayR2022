@@ -195,7 +195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   InterpolationSpace: 0
-  InterpolationTarget: {fileID: 0}
+  InterpolationTarget: {fileID: 5122036879405405590}
   InterpolateErrorCorrection: 1
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
@@ -281,7 +281,7 @@ PrefabInstance:
     - target: {fileID: 1490571325155173874, guid: b6fea975c5994b741ae6cc1347b551c9,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0
+      value: -1.75
       objectReference: {fileID: 0}
     - target: {fileID: 1490571325155173874, guid: b6fea975c5994b741ae6cc1347b551c9,
         type: 3}

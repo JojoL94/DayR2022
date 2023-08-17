@@ -50,11 +50,10 @@ public class CharacterRobotHandler : NetworkBehaviour
         legPrefabs = legPrefabs.OrderBy(n => n.name).ToList();
     }
 
-    void Start()
+    public void RoboterCustomizerEinrichten()
     {
         if (SceneManager.GetActiveScene().name != "Ready")
             return;
-
         robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
         robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
         robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
@@ -70,7 +69,7 @@ public class CharacterRobotHandler : NetworkBehaviour
 
 
         //Request host to change the outfit, if we have input authority over the object.
-        if (Object.HasInputAuthority)
+        //if (Object.HasInputAuthority)
             RPC_RequestRobotPartsChange(newRobotParts);
     }
 
@@ -102,7 +101,7 @@ public class CharacterRobotHandler : NetworkBehaviour
         //GetComponent<HPHandler>().ResetMeshRenderers();
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     void RPC_RequestRobotPartsChange(NetworkRobotParts newNetworkRobotParts, RpcInfo info = default)
     {
         Debug.Log(
@@ -134,7 +133,7 @@ public class CharacterRobotHandler : NetworkBehaviour
             newRobotPart.kanonePrefabID = 0;
 
         //Request host to change the outfit, if we have input authority over the object.
-        if (Object.HasInputAuthority)
+        //if (Object.HasInputAuthority)
             RPC_RequestRobotPartsChange(newRobotPart);
     }
 
@@ -149,7 +148,7 @@ public class CharacterRobotHandler : NetworkBehaviour
             newRobotPart.huellePrefabID = 0;
 
         //Request host to change the outfit, if we have input authority over the object.
-        if (Object.HasInputAuthority)
+        //if (Object.HasInputAuthority)
             RPC_RequestRobotPartsChange(newRobotPart);
     }
 
@@ -164,7 +163,7 @@ public class CharacterRobotHandler : NetworkBehaviour
             newRobotPart.interiorPrefabID = 0;
 
         //Request host to change the outfit, if we have input authority over the object.
-        if (Object.HasInputAuthority)
+        //if (Object.HasInputAuthority)
             RPC_RequestRobotPartsChange(newRobotPart);
     }
 
@@ -179,7 +178,7 @@ public class CharacterRobotHandler : NetworkBehaviour
             newRobotPart.legPrefabID = 0;
 
         //Request host to change the outfit, if we have input authority over the object.
-        if (Object.HasInputAuthority)
+        //if (Object.HasInputAuthority)
             RPC_RequestRobotPartsChange(newRobotPart);
     }
 }
