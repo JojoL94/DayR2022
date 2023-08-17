@@ -46,7 +46,7 @@ GameObject:
   - component: {fileID: 6583128467361744853}
   - component: {fileID: 6910824993018166149}
   m_Layer: 0
-  m_Name: HitboxDoor
+  m_Name: Hitbox
   m_TagString: Door
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -86,56 +86,6 @@ MonoBehaviour:
   Offset: {x: 0, y: 0, z: 0}
   Root: {fileID: 9214645184098993898}
   GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
---- !u!1 &5015999044923616050
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2463229874696382270}
-  - component: {fileID: 6100687321230785814}
-  m_Layer: 0
-  m_Name: HitboxChair
-  m_TagString: Chair
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2463229874696382270
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5015999044923616050}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2, y: 7.8999996, z: -2.8}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 239505825015880686}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &6100687321230785814
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5015999044923616050}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 1014831617, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Type: 1
-  SphereRadius: 0
-  BoxExtents: {x: 1, y: 1, z: 1}
-  Offset: {x: 0, y: 0, z: 0}
-  Root: {fileID: 0}
-  GizmosColor: {r: 1, g: 0.92156863, b: 0.015686275, a: 1}
 --- !u!1 &7114915075156089524
 GameObject:
   m_ObjectHideFlags: 0
@@ -173,7 +123,6 @@ Transform:
   m_Children:
   - {fileID: 5122036879405405590}
   - {fileID: 6583128467361744853}
-  - {fileID: 2463229874696382270}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &7857698369737885094
@@ -196,8 +145,7 @@ MonoBehaviour:
   Flags: 2305
   NetworkGuid:
     RawGuidValue: 56af5ec42ab0de9429288ee8737b5e02
-  NestedObjects:
-  - {fileID: 5080965733484439443}
+  NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 4576923280587394962}
   - {fileID: 9214645184098993898}
@@ -247,7 +195,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   InterpolationSpace: 0
-  InterpolationTarget: {fileID: 5122036879405405590}
+  InterpolationTarget: {fileID: 0}
   InterpolateErrorCorrection: 1
   InterpolatedErrorCorrectionSettings:
     MinRate: 3.3
@@ -280,7 +228,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 7, y: 1, z: 13}
+  m_Size: {x: 10, y: 1, z: 13}
   m_Center: {x: 0, y: 5, z: 0}
 --- !u!65 &590933076968590998
 BoxCollider:
@@ -333,7 +281,7 @@ PrefabInstance:
     - target: {fileID: 1490571325155173874, guid: b6fea975c5994b741ae6cc1347b551c9,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: -1.75
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1490571325155173874, guid: b6fea975c5994b741ae6cc1347b551c9,
         type: 3}
@@ -600,11 +548,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5122036879405405590}
     m_Modifications:
-    - target: {fileID: 430471105498804199, guid: c0c946f6fb24c444b8ac8176abcb70f0,
-        type: 3}
-      propertyPath: Flags
-      value: 3073
-      objectReference: {fileID: 0}
     - target: {fileID: 6199531298785450186, guid: c0c946f6fb24c444b8ac8176abcb70f0,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -660,16 +603,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Huelle
       objectReference: {fileID: 0}
-    - target: {fileID: 6976409911619773264, guid: c0c946f6fb24c444b8ac8176abcb70f0,
-        type: 3}
-      propertyPath: Flags
-      value: 3073
-      objectReference: {fileID: 0}
-    - target: {fileID: 6976409911619773264, guid: c0c946f6fb24c444b8ac8176abcb70f0,
-        type: 3}
-      propertyPath: NetworkedBehaviours.Array.size
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -681,18 +614,6 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 4862304689730275444}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &5080965733484439443 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 430471105498804199, guid: c0c946f6fb24c444b8ac8176abcb70f0,
-    type: 3}
-  m_PrefabInstance: {fileID: 4862304689730275444}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &8963019478041789447
 PrefabInstance:
   m_ObjectHideFlags: 0

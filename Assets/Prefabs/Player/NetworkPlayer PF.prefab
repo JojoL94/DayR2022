@@ -1129,8 +1129,6 @@ MonoBehaviour:
   _interpolationDataSource: 0
   playerNickNameTM: {fileID: 7319436505145594861}
   playerModel: {fileID: 8054853945983303956}
-  robotPrefab: {fileID: 7857698369737885094, guid: 56af5ec42ab0de9429288ee8737b5e02,
-    type: 3}
   _nickName:
     _length: 0
     _data:
@@ -1409,12 +1407,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
   robot: {fileID: 0}
-  door: {fileID: 0}
-  doorProcess: 0
-  doorIsOpen: 0
-  closedMarker: {fileID: 0}
-  openedMarker: {fileID: 0}
-  doorTargetPosition: {fileID: 0}
 --- !u!1 &5276705138384389717
 GameObject:
   m_ObjectHideFlags: 0

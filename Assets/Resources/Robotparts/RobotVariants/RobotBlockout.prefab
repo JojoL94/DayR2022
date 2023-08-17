@@ -88,8 +88,7 @@ MonoBehaviour:
   Flags: 2305
   NetworkGuid:
     RawGuidValue: 3a0026eae67a6144393f0c1d53d6d248
-  NestedObjects:
-  - {fileID: 3404442563343641837}
+  NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 3885431449920316559}
   - {fileID: 2709548567601550874}
@@ -104,21 +103,11 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7856723278184053101}
     m_Modifications:
-    - target: {fileID: 430471105498804199, guid: c0c946f6fb24c444b8ac8176abcb70f0,
-        type: 3}
-      propertyPath: Flags
-      value: 3073
-      objectReference: {fileID: 0}
     - target: {fileID: 990767559850037967, guid: c0c946f6fb24c444b8ac8176abcb70f0,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
       objectReference: {fileID: 2100000, guid: 53e6d356f6a9ea241bb6c3d678d07097, type: 2}
-    - target: {fileID: 2144040925223652712, guid: c0c946f6fb24c444b8ac8176abcb70f0,
-        type: 3}
-      propertyPath: Flags
-      value: 3073
-      objectReference: {fileID: 0}
     - target: {fileID: 3381361640239876729, guid: c0c946f6fb24c444b8ac8176abcb70f0,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -179,16 +168,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Huelle
       objectReference: {fileID: 0}
-    - target: {fileID: 6976409911619773264, guid: c0c946f6fb24c444b8ac8176abcb70f0,
-        type: 3}
-      propertyPath: Flags
-      value: 3073
-      objectReference: {fileID: 0}
-    - target: {fileID: 6976409911619773264, guid: c0c946f6fb24c444b8ac8176abcb70f0,
-        type: 3}
-      propertyPath: NetworkedBehaviours.Array.size
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 9023496900913083303, guid: c0c946f6fb24c444b8ac8176abcb70f0,
         type: 3}
       propertyPath: m_Materials.Array.data[0]
@@ -204,18 +183,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c0c946f6fb24c444b8ac8176abcb70f0, type: 3}
---- !u!114 &3404442563343641837 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 430471105498804199, guid: c0c946f6fb24c444b8ac8176abcb70f0,
-    type: 3}
-  m_PrefabInstance: {fileID: 3082244770744107786}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &8993545070406261696 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 6199531298785450186, guid: c0c946f6fb24c444b8ac8176abcb70f0,

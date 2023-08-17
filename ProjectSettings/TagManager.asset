@@ -8,7 +8,6 @@ TagManager:
   - ProcessQueue
   - Robot
   - Door
-  - Chair
   layers:
   - Default
   - TransparentFX
