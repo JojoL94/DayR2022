@@ -88,6 +88,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
                     //Check if we are the host
                     if (runner.SessionInfo.MaxPlayers - player.PlayerId == 1)
                     {
+
                         spawnPosition = new Vector3(-1 * 3, 1, 0);
                     }
                     else
@@ -98,9 +99,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
                 }
                 NetworkPlayer spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
                 
-                NetworkObject tmpRobot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
-                spawnedNetworkPlayer.GetComponent<CharacterRobotHandler>().robot =tmpRobot;
-                spawnedNetworkPlayer.GetComponent<CharacterRobotHandler>().RoboterCustomizerEinrichten();
+
                 spawnedNetworkPlayer.transform.position = spawnPosition;
                 
                 //Store the token for the player

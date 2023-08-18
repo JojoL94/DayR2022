@@ -9,16 +9,16 @@ using UnityEngine.UI;
 public class CharacterRobotHandler : NetworkBehaviour
 {
     [Header("Robot parts")] public NetworkObject robot;
-    GameObject robotKanone;
-    GameObject robotHuelle;
-    GameObject robotInterior;
-    GameObject robotLeg;
+    [SerializeField] GameObject robotKanone;
+    [SerializeField] GameObject robotHuelle;
+    [SerializeField] GameObject robotInterior;
+    [SerializeField] GameObject robotLeg;
 
     //List of Robot part prefabs
-    List<GameObject> kanonePrefabs = new List<GameObject>();
-    List<GameObject> huellePrefabs = new List<GameObject>();
-    List<GameObject> interiorPrefabs = new List<GameObject>();
-    List<GameObject> legPrefabs = new List<GameObject>();
+    [SerializeField] List<GameObject> kanonePrefabs = new List<GameObject>();
+    [SerializeField] List<GameObject> huellePrefabs = new List<GameObject>();
+    [SerializeField] List<GameObject> interiorPrefabs = new List<GameObject>();
+    [SerializeField] List<GameObject> legPrefabs = new List<GameObject>();
 
     struct NetworkRobotParts : INetworkStruct
     {
@@ -33,27 +33,29 @@ public class CharacterRobotHandler : NetworkBehaviour
 
     private void Awake()
     {
-        // Load all heads and sort them
+        // Load all kanonen and sort them
         kanonePrefabs = Resources.LoadAll<GameObject>("Robotparts/Kanonen/").ToList();
         kanonePrefabs = kanonePrefabs.OrderBy(n => n.name).ToList();
 
-        //Load all bodies and sort them 
+        //Load all huellen and sort them 
         huellePrefabs = Resources.LoadAll<GameObject>("Robotparts/Huellen/").ToList();
         huellePrefabs = huellePrefabs.OrderBy(n => n.name).ToList();
 
-        //Load all left arms and sort them 
+        //Load all interiors and sort them 
         interiorPrefabs = Resources.LoadAll<GameObject>("Robotparts/Interiors/").ToList();
         interiorPrefabs = interiorPrefabs.OrderBy(n => n.name).ToList();
 
-        //Load all right arms and sort them 
+        //Load all legs and sort them 
         legPrefabs = Resources.LoadAll<GameObject>("Robotparts/Legs/").ToList();
         legPrefabs = legPrefabs.OrderBy(n => n.name).ToList();
     }
 
-    public void RoboterCustomizerEinrichten()
+    public void Start()
     {
         if (SceneManager.GetActiveScene().name != "Ready")
             return;
+        robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
+        
         robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
         robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
         robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
@@ -62,17 +64,29 @@ public class CharacterRobotHandler : NetworkBehaviour
         NetworkRobotParts newRobotParts = networkRobotParts;
         //******************************** Hier muss ein Save and Load System rein anstatt dieses Random Zeug******
         //Pick a random outfit
+        /*
         newRobotParts.kanonePrefabID = (byte)Random.Range(0, kanonePrefabs.Count);
         newRobotParts.huellePrefabID = (byte)Random.Range(0, huellePrefabs.Count);
         newRobotParts.interiorPrefabID = (byte)Random.Range(0, interiorPrefabs.Count);
         newRobotParts.legPrefabID = (byte)Random.Range(0, legPrefabs.Count);
-
+        */
 
         //Request host to change the outfit, if we have input authority over the object.
         //if (Object.HasInputAuthority)
             RPC_RequestRobotPartsChange(newRobotParts);
     }
 
+    public void SetUpCharacterRobotHandler()
+    {
+        robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
+        
+        robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
+        robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
+        robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
+        robotLeg = robot.transform.GetChild(0).transform.GetChild(3).gameObject;
+    }
+    
+    
     GameObject ReplaceRobotPart(GameObject currentRobotPart, GameObject prefabNewRobotPart)
     {
         GameObject newPart = Instantiate(prefabNewRobotPart, currentRobotPart.transform.position,
@@ -84,8 +98,12 @@ public class CharacterRobotHandler : NetworkBehaviour
         return newPart;
     }
 
-    void ReplaceBodyParts()
+    void ReplaceRobotParts()
     {
+        if (robotKanone == null || robotHuelle == null || robotInterior == null || robotLeg == null)
+        {
+            SetUpCharacterRobotHandler();
+        }
         //Replace Kanone
         robotKanone = ReplaceRobotPart(robotKanone, kanonePrefabs[networkRobotParts.kanonePrefabID]);
 
@@ -101,7 +119,7 @@ public class CharacterRobotHandler : NetworkBehaviour
         //GetComponent<HPHandler>().ResetMeshRenderers();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.All)]
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
     void RPC_RequestRobotPartsChange(NetworkRobotParts newNetworkRobotParts, RpcInfo info = default)
     {
         Debug.Log(
@@ -118,7 +136,7 @@ public class CharacterRobotHandler : NetworkBehaviour
 
     private void OnRobotPartsChanged()
     {
-        ReplaceBodyParts();
+        ReplaceRobotParts();
     }
 
 

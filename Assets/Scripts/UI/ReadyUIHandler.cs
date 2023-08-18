@@ -63,17 +63,19 @@ public class ReadyUIHandler : NetworkBehaviour
         Runner.SessionInfo.IsOpen = false;
 
         GameObject[]  gameObjectsToTransfer = GameObject.FindGameObjectsWithTag("Player");
-        NetworkObject tmpRobot = GameObject.FindWithTag("Robot").GetComponent<NetworkObject>();
-        DontDestroyOnLoad(GameObject.FindGameObjectWithTag("Robot"));
+        GameObject tmpRobot = GameObject.FindGameObjectWithTag("Robot");
+
+        
         foreach (GameObject gameObjectToTransfer in gameObjectsToTransfer)
         {
-            gameObjectToTransfer.GetComponent<RobotHandler>().robot = tmpRobot;
+            tmpRobot.GetComponent<NetworkObject>().AssignInputAuthority(gameObjectToTransfer.GetComponent<PlayerRef>());
+            gameObjectToTransfer.GetComponent<RobotHandler>().robot = tmpRobot.GetComponent<NetworkObject>();
             DontDestroyOnLoad(gameObjectToTransfer);
             //Check if the player is ready
             if (!gameObjectToTransfer.GetComponent<CharacterOutfitHandler>().isDoneWithCharacterSelection)
                 Runner.Disconnect(gameObjectToTransfer.GetComponent<NetworkObject>().InputAuthority);
         }
-
+        DontDestroyOnLoad(tmpRobot);
         //Update scene for the network
         Runner.SetActiveScene("World1");
     }
