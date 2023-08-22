@@ -59,5 +59,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerPrefab: {fileID: 8439091692384082190, guid: 913e1b08620d21841b5a2c4a29553dd7,
     type: 3}
-  robotPrefab: {fileID: 7857698369737885094, guid: 56af5ec42ab0de9429288ee8737b5e02,
+  robotPrefab: {fileID: 7114915075156089524, guid: 56af5ec42ab0de9429288ee8737b5e02,
     type: 3}
+  robot: {fileID: 0}

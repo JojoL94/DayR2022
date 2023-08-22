@@ -7,8 +7,7 @@ using UnityEngine;
 public class RobotHandler : NetworkBehaviour
 {
     //[Header("Prefabs")] public GameObject explosionParticleSystemPrefab;
-    [SerializeField] public NetworkObject robot;
-    [SerializeField] private Transform door;
+    //private Transform door;
     //[Header("Collision detection")] public LayerMask collisionLayers;
 
     //Thrown by info
@@ -17,57 +16,63 @@ public class RobotHandler : NetworkBehaviour
 
     //Timing
     TickTimer explodeTickTimer = TickTimer.None;
-    
+
     NetworkRigidbody networkRigidbody;
-    
-    [Networked] public bool doorProcess { get; set; } 
-    [Networked] public bool doorIsOpen { get; set; } 
+
+    [Networked] public bool doorProcess { get; set; }
+    [Networked] public bool doorIsOpen { get; set; }
     [SerializeField] private Transform closedMarker;
     [SerializeField] private Transform openedMarker;
     [SerializeField] private Transform doorTargetPosition;
 
     int doorSpeed = 5;
 
-    public void RoboterEinrichten()
+    public void Start()
     {
-        door = robot.transform.GetChild(0).GetChild(1).GetChild(0).transform;
-        closedMarker = robot.transform.GetChild(1).GetChild(0).GetChild(0).transform;
-        openedMarker = robot.transform.GetChild(1).GetChild(0).GetChild(1).transform;
+        //door = transform.GetChild(0).GetChild(1).GetChild(0).transform;
+        closedMarker = transform.GetChild(1).GetChild(0).GetChild(0).transform;
+        openedMarker = transform.GetChild(1).GetChild(0).GetChild(1).transform;
+        doorTargetPosition = closedMarker;
     }
 
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void SetUpRobotHandler()
+    {
+        //door = transform.GetChild(0).GetChild(1).GetChild(0).transform;
+        closedMarker = transform.GetChild(1).GetChild(0).GetChild(0).transform;
+        openedMarker = transform.GetChild(1).GetChild(0).GetChild(1).transform;
+        doorTargetPosition = closedMarker;
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
     public void RPC_DoorOpenRequest(bool newDoorProcess, bool newDoorIsOpen)
     {
         doorProcess = newDoorProcess;
         doorIsOpen = newDoorIsOpen;
     }
-    public void OpenCloseDoor(Transform tmpRobot)
-    {
 
+    public void OpenCloseDoor()
+    {
         Debug.Log("Open Close Methode Triggert");
-        if (tmpRobot == robot.transform)
+        Debug.Log("Versuche auf/zu zu machen");
+        if (!doorProcess)
         {
-            Debug.Log("Versuche auf/zu zu machen");
-            if (!doorProcess)
+            doorProcess = true;
+            float dist = Vector3.Distance(transform.GetChild(0).GetChild(1).GetChild(0).transform.position,
+                closedMarker.transform.position);
+            if (dist < 0.3f)
             {
-                doorProcess = true;
-                float dist = Vector3.Distance(door.position, closedMarker.transform.position);
-                if (dist < 0.3f)
-                {
-                    RPC_DoorOpenRequest(true, false);
-                }
-                else
-                {
-                    RPC_DoorOpenRequest(true, true);
-                }
+                RPC_DoorOpenRequest(true, false);
+            }
+            else
+            {
+                RPC_DoorOpenRequest(true, true);
             }
         }
         else
         {
-            Debug.Log("Robot Door Access denied");
-            //Eintritt abgelehnt
+            Debug.Log("Door is in Process");
+            //Eingabe abgelehnt
         }
-
     }
 
     //Network update
@@ -83,21 +88,32 @@ public class RobotHandler : NetworkBehaviour
             {
                 doorTargetPosition = openedMarker;
             }
-            Vector3 moveDirection = (doorTargetPosition.position - door.transform.position).normalized;
-            float distanceToTarget = Vector3.Distance(door.transform.position, doorTargetPosition.position);
+
+            Vector3 moveDirection =
+                (doorTargetPosition.position - transform.GetChild(0).GetChild(1).GetChild(0).transform.position)
+                .normalized;
+            float distanceToTarget =
+                Vector3.Distance(transform.GetChild(0).GetChild(1).GetChild(0).transform.transform.position,
+                    doorTargetPosition.position);
 
             if (distanceToTarget > 0.01f) // Ein kleiner Schwellenwert, um das "Angekommen"-Kriterium zu definieren
             {
-                door.transform.position += moveDirection * doorSpeed * Runner.DeltaTime;
+                transform.GetChild(0).GetChild(1).GetChild(0).transform.transform.position +=
+                    moveDirection * doorSpeed * Runner.DeltaTime;
             }
             else
             {
                 RPC_DoorOpenRequest(false, false);
             }
         }
+        else
+        {
+            transform.GetChild(0).GetChild(1).GetChild(0).transform.position =
+                doorTargetPosition.transform.position;
+        }
+
         if (Object.HasStateAuthority)
         {
- 
             /*
             if (explodeTickTimer.Expired(Runner))
             {

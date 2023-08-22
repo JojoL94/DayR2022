@@ -9,9 +9,11 @@ using UnityEngine.UI;
 public class ReadyUIHandler : NetworkBehaviour
 {
     [Header("UI")] public TextMeshProUGUI buttonReadyText;
+    public TextMeshProUGUI buttonRobotSpawnText;
     public TextMeshProUGUI countDownText;
 
     bool isReady = false;
+    private bool robotAllreadySpawned = false;
 
     Vector3 desiredCameraPosition = new Vector3(0, 5, 20);
 
@@ -35,6 +37,7 @@ public class ReadyUIHandler : NetworkBehaviour
         {
             desiredCameraPosition = new Vector3(NetworkPlayer.Local.transform.position.x, 0.95f, 5);
             lerpSpeed = 7;
+
         }
         else
         {
@@ -63,19 +66,17 @@ public class ReadyUIHandler : NetworkBehaviour
         Runner.SessionInfo.IsOpen = false;
 
         GameObject[]  gameObjectsToTransfer = GameObject.FindGameObjectsWithTag("Player");
-        GameObject tmpRobot = GameObject.FindGameObjectWithTag("Robot");
+        GameObject  robot = GameObject.FindGameObjectWithTag("Robot");
+        DontDestroyOnLoad(robot);
 
-        
         foreach (GameObject gameObjectToTransfer in gameObjectsToTransfer)
         {
-            tmpRobot.GetComponent<NetworkObject>().AssignInputAuthority(gameObjectToTransfer.GetComponent<PlayerRef>());
-            gameObjectToTransfer.GetComponent<RobotHandler>().robot = tmpRobot.GetComponent<NetworkObject>();
             DontDestroyOnLoad(gameObjectToTransfer);
             //Check if the player is ready
             if (!gameObjectToTransfer.GetComponent<CharacterOutfitHandler>().isDoneWithCharacterSelection)
                 Runner.Disconnect(gameObjectToTransfer.GetComponent<NetworkObject>().InputAuthority);
         }
-        DontDestroyOnLoad(tmpRobot);
+
         //Update scene for the network
         Runner.SetActiveScene("World1");
     }
@@ -112,6 +113,23 @@ public class ReadyUIHandler : NetworkBehaviour
         NetworkPlayer.Local.GetComponent<CharacterOutfitHandler>().OnCycleRightArm();
     }
     /**************** Robot ****************/
+    public void OnSpawnRobot()
+    {
+        if (isReady)
+            return;
+        
+        if (!robotAllreadySpawned)
+        {
+            NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().SetUpCharacterRobotHandler(true);
+            buttonRobotSpawnText.text = "Spawn Robot?";
+            robotAllreadySpawned = true;
+        }
+        if (robotAllreadySpawned)
+        {
+            buttonRobotSpawnText.text = "--";
+        }
+    }
+    
     public void OnChangeRobotKanone()
     {
         if (isReady)

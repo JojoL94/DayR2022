@@ -43,7 +43,7 @@ public class InteractionHandler : NetworkBehaviour
         Debug.Log("Try Interact");
         float hitDistance = 5;
         Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, hitDistance, Object.InputAuthority,
-            out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority);
+            out var hitinfo, collisionLayers, HitOptions.None);
 
         bool isInteractableObject = false;
 
@@ -58,7 +58,7 @@ public class InteractionHandler : NetworkBehaviour
                 isInteractableObject = true;
                 if (hitinfo.Hitbox.tag == "Door")
                 {
-                    GetComponent<RobotHandler>().OpenCloseDoor(hitinfo.Hitbox.transform.root.transform);
+                    hitinfo.Hitbox.transform.root.GetComponent<RobotHandler>().OpenCloseDoor();
                 } 
             }
         }

@@ -1063,7 +1063,6 @@ GameObject:
   - component: {fileID: 5358983572124071296}
   - component: {fileID: 6674549233667202101}
   - component: {fileID: 1091845276468042356}
-  - component: {fileID: 8844333159331884723}
   m_Layer: 0
   m_Name: NetworkPlayer PF
   m_TagString: Player
@@ -1129,6 +1128,9 @@ MonoBehaviour:
   _interpolationDataSource: 0
   playerNickNameTM: {fileID: 7319436505145594861}
   playerModel: {fileID: 8054853945983303956}
+  robotPrefab: {fileID: 7114915075156089524, guid: 56af5ec42ab0de9429288ee8737b5e02,
+    type: 3}
+  robot: {fileID: 0}
   _nickName:
     _length: 0
     _data:
@@ -1169,7 +1171,6 @@ MonoBehaviour:
   - {fileID: 5358983572124071296}
   - {fileID: 6674549233667202101}
   - {fileID: 1091845276468042356}
-  - {fileID: 8844333159331884723}
   SimulationBehaviours: []
 --- !u!114 &5931840031319100829
 MonoBehaviour:
@@ -1392,21 +1393,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _interpolationDataSource: 0
+  robotPrefab: {fileID: 7857698369737885094, guid: 56af5ec42ab0de9429288ee8737b5e02,
+    type: 3}
   robot: {fileID: 0}
---- !u!114 &8844333159331884723
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4398370856537798957}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1cdc73bd4ebb4994d8c30d8322b881f3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
-  robot: {fileID: 0}
+  robotGO: {fileID: 0}
+  robotKanone: {fileID: 0}
+  robotHuelle: {fileID: 0}
+  robotInterior: {fileID: 0}
+  robotLeg: {fileID: 0}
+  kanonePrefabs: []
+  huellePrefabs: []
+  interiorPrefabs: []
+  legPrefabs: []
 --- !u!1 &5276705138384389717
 GameObject:
   m_ObjectHideFlags: 0

@@ -8,7 +8,8 @@ using UnityEngine.UI;
 
 public class CharacterRobotHandler : NetworkBehaviour
 {
-    [Header("Robot parts")] public NetworkObject robot;
+    [Header("Robot parts")] public NetworkObject robotPrefab;
+    public NetworkObject robot;
     [SerializeField] GameObject robotKanone;
     [SerializeField] GameObject robotHuelle;
     [SerializeField] GameObject robotInterior;
@@ -50,43 +51,42 @@ public class CharacterRobotHandler : NetworkBehaviour
         legPrefabs = legPrefabs.OrderBy(n => n.name).ToList();
     }
 
-    public void Start()
+
+    public void SetUpCharacterRobotHandler(bool spawnRobot)
     {
-        if (SceneManager.GetActiveScene().name != "Ready")
-            return;
-        robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
-        
-        robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
-        robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
-        robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
-        robotLeg = robot.transform.GetChild(0).transform.GetChild(3).gameObject;
+        if (spawnRobot)
+        {
+            robot = Runner.Spawn(robotPrefab, transform.position + transform.forward * -15f, Quaternion.identity,
+                Object.StateAuthority,
+                (runner, spawnedRobot) => { spawnedRobot.GetComponent<RobotHandler>().SetUpRobotHandler(); });
+            robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
+            robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
+            robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
+            robotLeg = robot.transform.GetChild(0).transform.GetChild(3).gameObject;
 
-        NetworkRobotParts newRobotParts = networkRobotParts;
-        //******************************** Hier muss ein Save and Load System rein anstatt dieses Random Zeug******
-        //Pick a random outfit
-        /*
-        newRobotParts.kanonePrefabID = (byte)Random.Range(0, kanonePrefabs.Count);
-        newRobotParts.huellePrefabID = (byte)Random.Range(0, huellePrefabs.Count);
-        newRobotParts.interiorPrefabID = (byte)Random.Range(0, interiorPrefabs.Count);
-        newRobotParts.legPrefabID = (byte)Random.Range(0, legPrefabs.Count);
-        */
-
-        //Request host to change the outfit, if we have input authority over the object.
-        //if (Object.HasInputAuthority)
+            NetworkRobotParts newRobotParts = networkRobotParts;
             RPC_RequestRobotPartsChange(newRobotParts);
+        }
+        else
+        {
+            if (robot == null)
+            {
+                Debug.Log("No robot found");
+            }
+            else
+            {
+                robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
+                robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
+                robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
+                robotLeg = robot.transform.GetChild(0).transform.GetChild(3).gameObject;
+
+                NetworkRobotParts newRobotParts = networkRobotParts;
+                RPC_RequestRobotPartsChange(newRobotParts);
+            }
+        }
     }
 
-    public void SetUpCharacterRobotHandler()
-    {
-        robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
-        
-        robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
-        robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
-        robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
-        robotLeg = robot.transform.GetChild(0).transform.GetChild(3).gameObject;
-    }
-    
-    
+
     GameObject ReplaceRobotPart(GameObject currentRobotPart, GameObject prefabNewRobotPart)
     {
         GameObject newPart = Instantiate(prefabNewRobotPart, currentRobotPart.transform.position,
@@ -102,8 +102,17 @@ public class CharacterRobotHandler : NetworkBehaviour
     {
         if (robotKanone == null || robotHuelle == null || robotInterior == null || robotLeg == null)
         {
-            SetUpCharacterRobotHandler();
+            if (GameObject.FindGameObjectWithTag("Robot") != null)
+            {
+                robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
+                SetUpCharacterRobotHandler(false);
+            }
+            else
+            {
+                SetUpCharacterRobotHandler(true);
+            }
         }
+
         //Replace Kanone
         robotKanone = ReplaceRobotPart(robotKanone, kanonePrefabs[networkRobotParts.kanonePrefabID]);
 
@@ -152,7 +161,7 @@ public class CharacterRobotHandler : NetworkBehaviour
 
         //Request host to change the outfit, if we have input authority over the object.
         //if (Object.HasInputAuthority)
-            RPC_RequestRobotPartsChange(newRobotPart);
+        RPC_RequestRobotPartsChange(newRobotPart);
     }
 
     public void OnCycleHuelle()
@@ -167,7 +176,7 @@ public class CharacterRobotHandler : NetworkBehaviour
 
         //Request host to change the outfit, if we have input authority over the object.
         //if (Object.HasInputAuthority)
-            RPC_RequestRobotPartsChange(newRobotPart);
+        RPC_RequestRobotPartsChange(newRobotPart);
     }
 
     public void OnCycleInterior()
@@ -182,7 +191,7 @@ public class CharacterRobotHandler : NetworkBehaviour
 
         //Request host to change the outfit, if we have input authority over the object.
         //if (Object.HasInputAuthority)
-            RPC_RequestRobotPartsChange(newRobotPart);
+        RPC_RequestRobotPartsChange(newRobotPart);
     }
 
     public void OnCycleLeg()
@@ -197,6 +206,6 @@ public class CharacterRobotHandler : NetworkBehaviour
 
         //Request host to change the outfit, if we have input authority over the object.
         //if (Object.HasInputAuthority)
-            RPC_RequestRobotPartsChange(newRobotPart);
+        RPC_RequestRobotPartsChange(newRobotPart);
     }
 }

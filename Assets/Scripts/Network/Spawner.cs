@@ -9,8 +9,6 @@ using UnityEngine.SceneManagement;
 public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
 {
     public NetworkPlayer playerPrefab;
-
-    public NetworkObject robot;
     // Mapping between Token ID and Re-created Players
     Dictionary<int, NetworkPlayer> mapTokenIDWithNetworkPlayer;
 
@@ -72,7 +70,6 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
                 Debug.Log($"Found old connection token for token {playerToken}. Assigning controlls to that player");
 
                 networkPlayer.GetComponent<NetworkObject>().AssignInputAuthority(player);
-
                 networkPlayer.Spawned();
             }
             else
@@ -82,24 +79,20 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
                 bool isReadyScene = SceneManager.GetActiveScene().name == "Ready";
 
                 Vector3 spawnPosition = Utils.GetRandomSpawnPoint();
-
                 if (isReadyScene)
                 {
                     //Check if we are the host
                     if (runner.SessionInfo.MaxPlayers - player.PlayerId == 1)
                     {
-
                         spawnPosition = new Vector3(-1 * 3, 1, 0);
                     }
                     else
                     {
                         spawnPosition = new Vector3(player.PlayerId * 3, 1, 0);
                     }
-
                 }
-                NetworkPlayer spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
-                
 
+                NetworkPlayer spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
                 spawnedNetworkPlayer.transform.position = spawnPosition;
                 
                 //Store the token for the player

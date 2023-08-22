@@ -45,7 +45,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6583128467361744853}
   - component: {fileID: 6910824993018166149}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Hitbox
   m_TagString: Door
   m_Icon: {fileID: 0}
@@ -101,6 +101,7 @@ GameObject:
   - component: {fileID: 7452536113789317184}
   - component: {fileID: 590933076968590998}
   - component: {fileID: 9214645184098993898}
+  - component: {fileID: 7390023408258365724}
   m_Layer: 0
   m_Name: RobotBlockoutTexturiert
   m_TagString: Robot
@@ -149,6 +150,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 4576923280587394962}
   - {fileID: 9214645184098993898}
+  - {fileID: 7390023408258365724}
   - {fileID: 3372727800493359781}
   - {fileID: 4521549502356877360}
   - {fileID: 3297283975213072760}
@@ -270,6 +272,24 @@ MonoBehaviour:
   GizmosColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   Hitboxes:
   - {fileID: 6910824993018166149}
+--- !u!114 &7390023408258365724
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7114915075156089524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1cdc73bd4ebb4994d8c30d8322b881f3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  _doorProcess: 0
+  _doorIsOpen: 0
+  closedMarker: {fileID: 0}
+  openedMarker: {fileID: 0}
+  doorTargetPosition: {fileID: 0}
 --- !u!1001 &1828178576269352885
 PrefabInstance:
   m_ObjectHideFlags: 0

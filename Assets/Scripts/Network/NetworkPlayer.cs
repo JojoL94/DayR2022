@@ -10,7 +10,8 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     public TextMeshProUGUI playerNickNameTM;
     public static NetworkPlayer Local { get; set; }
     public Transform playerModel;
-
+    public GameObject robotPrefab;
+    public NetworkObject robot;
     [Networked(OnChanged = nameof(OnNickNameChanged))]
     public NetworkString<_16> nickName { get; set; }
 
@@ -51,7 +52,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
 
-
             }
             else
             {
@@ -75,7 +75,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
-                GetComponent<RobotHandler>().RoboterEinrichten();
             }
 
             RPC_SetNickName(GameManager.instance.playerNickName);
@@ -90,7 +89,6 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
 
             //Disable UI for remote player
             localUI.SetActive(false);
-
             Debug.Log($"{Time.time} Spawned remote player");  
         }
 
