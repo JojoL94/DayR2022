@@ -37,6 +37,7 @@ public class RobotHandler : NetworkBehaviour
         closedMarker = transform.GetChild(1).GetChild(0).GetChild(0).transform;
         openedMarker = transform.GetChild(1).GetChild(0).GetChild(1).transform;
         doorTargetPosition = closedMarker;
+        SetUpLegs();
         // Du kannst jetzt auf die legTargetHandlers-Liste zugreifen, um auf die gesammelten Skripte zuzugreifen
         // Zum Beispiel: legTargetHandlers[0].DoSomething();
     }
@@ -238,7 +239,7 @@ public class RobotHandler : NetworkBehaviour
         }
 
         // Überprüfe, ob die Liste mindestens 4 Elemente hat, bevor du sie kürzt
-        if (legTargetHandlers.Count >= 4)
+        if (legTargetHandlers.Count >= 5)
         {
             // Entferne die Elemente von Position [0] bis [3]
             legTargetHandlers.RemoveRange(0, 4);

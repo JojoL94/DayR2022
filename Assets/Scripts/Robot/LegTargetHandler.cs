@@ -25,7 +25,7 @@ public class LegTargetHandler : NetworkBehaviour
     private Vector3 oldStepMarker;
     private bool isMoving;
     private Vector3 movementDirection;
-    private float stepDistance = 5f;
+    private float stepDistance = 4f;
     private bool middleStep;
     private bool isInDefaultPosition;
     private Vector3 targetHit;
@@ -34,20 +34,39 @@ public class LegTargetHandler : NetworkBehaviour
     TickTimer defaultPositionTickTimer = TickTimer.None;
     private TickTimer stepTimer = TickTimer.None;
 
-    public override void FixedUpdateNetwork()
+    void Update()
     {
+        /*
         // Offset für den Raycast je nach Bewegungsrichtung
         Vector3 raycastDirection = Vector3.down;
+
+
+        // Normalisiere die Richtung (optional, falls du eine Einheitsrichtung benötigst)
+        raycastDirection.Normalize();
         if (isMoving)
         {
             // Offset in Laufrichtung hinzufügen
             raycastDirection += movementDirection * offsetAmount;
+        }*/
+        // Berechne die Richtung vom Punkt A zu Punkt B
+
+        Vector3 movementDirection = Vector3.down;
+
+        if (Vector3.Distance(new Vector3(transform.position.x, target.position.y, transform.position.z),target.position) > stepDistance)
+        {
+            movementDirection =
+                new Vector3(transform.position.x, target.position.y, transform.position.z) - target.position;
+            movementDirection.Normalize();
         }
+        Vector3 raycastDirection = Vector3.down;
+
+        raycastDirection += movementDirection * offsetAmount;
+
 
         RaycastHit hit;
         if (Physics.Raycast(transform.position, raycastDirection, out hit, Mathf.Infinity, groundLayer))
         {
-            targetHit = Vector3.MoveTowards(targetHit, hit.point, 30f * Runner.DeltaTime);
+            targetHit = Vector3.MoveTowards(targetHit, hit.point, 10f * Time.deltaTime);
             // Der Raycast hat den Boden getroffen
             Debug.DrawRay(transform.position, raycastDirection * raycastDistance, Color.green);
             float distancePointTarget = Vector3.Distance(hit.point, target.position);
@@ -75,6 +94,7 @@ public class LegTargetHandler : NetworkBehaviour
                 }
             }
 
+/*
             if (distancePointTarget > 0.2f && defaultPositionTickTimer.Expired(Runner) && !makeStep)
             {
                 nextStepMarker = targetHit;
@@ -86,7 +106,7 @@ public class LegTargetHandler : NetworkBehaviour
                 stepTimer = TickTimer.CreateFromSeconds(Runner, 2);
                 defaultPositionTickTimer = TickTimer.CreateFromSeconds(Runner, 2);
             }
-
+*/
             if (makeStep)
             {
                 if (stepTimer.Expired(Runner))
@@ -97,7 +117,7 @@ public class LegTargetHandler : NetworkBehaviour
                 if (middleStep)
                 {
                     target.position =
-                        Vector3.MoveTowards(target.position, middleStepMarker, moveSpeed * Runner.DeltaTime);
+                        Vector3.MoveTowards(target.position, middleStepMarker, moveSpeed * Time.deltaTime);
 
                     if (Vector3.Distance(target.position, middleStepMarker) < 1f)
                     {
@@ -108,7 +128,7 @@ public class LegTargetHandler : NetworkBehaviour
                 {
                     nextStepMarker = targetHit;
                     target.position =
-                        Vector3.MoveTowards(target.position, nextStepMarker, moveSpeed * Runner.DeltaTime);
+                        Vector3.MoveTowards(target.position, nextStepMarker, moveSpeed * Time.deltaTime);
                 }
 
                 if (Vector3.Distance(nextStepMarker, target.position) < 0.1f)

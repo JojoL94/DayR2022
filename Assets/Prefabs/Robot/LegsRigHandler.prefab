@@ -2756,6 +2756,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6913844657924020504, guid: 9a765ea68220eae428711e0132aaacbd,
         type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000,
+        type: 0}
+    - target: {fileID: 6913844657924020504, guid: 9a765ea68220eae428711e0132aaacbd,
+        type: 3}
       propertyPath: m_Name
       value: LegMarkerCenter
       objectReference: {fileID: 0}

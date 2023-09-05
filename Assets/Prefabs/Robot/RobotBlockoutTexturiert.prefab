@@ -333,13 +333,13 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 0.2
-  m_Radius: 0.2
+  m_Height: 2
+  m_Radius: 1.7
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 3.8, z: 0}
+  m_Center: {x: 0, y: 5, z: 0}
 --- !u!114 &8676690074758872974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -371,9 +371,9 @@ MonoBehaviour:
   gravity: -20
   jumpImpulse: 8
   acceleration: 20
-  braking: 20
+  braking: 2
   maxSpeed: 8
-  rotationSpeed: 80
+  rotationSpeed: 40
   viewUpDownRotationSpeed: 150
   _IsGrounded: 0
   _Velocity: {x: 0, y: 0, z: 0}
@@ -470,6 +470,7 @@ MonoBehaviour:
   Hitboxes:
   - {fileID: 6910824993018166149}
   - {fileID: 918190504736829774}
+  - {fileID: 3415183013155643599}
 --- !u!114 &7390023408258365724
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -683,10 +684,71 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5122036879405405590}
     m_Modifications:
+    - target: {fileID: 544707681649845722, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: m_Icon
+      value: 
+      objectReference: {fileID: -5487077368411116049, guid: 0000000000000000d000000000000000,
+        type: 0}
+    - target: {fileID: 666969594543670220, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: raycastDistance
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1814983702370693465, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: raycastDistance
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 1890392889871676036, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: raycastDistance
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 3223964381473096779, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.0000000063578285
+      objectReference: {fileID: 0}
+    - target: {fileID: 3223964381473096779, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3223964381473096779, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3223964381473096779, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3223964381473096779, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3223964381473096779, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: -90
+      objectReference: {fileID: 0}
+    - target: {fileID: 3223964381473096779, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 90
+      objectReference: {fileID: 0}
     - target: {fileID: 6455463806928402834, guid: d64862c172760884cb4a401c993ffd3d,
         type: 3}
       propertyPath: m_Name
       value: Legs
+      objectReference: {fileID: 0}
+    - target: {fileID: 6724321926871344370, guid: d64862c172760884cb4a401c993ffd3d,
+        type: 3}
+      propertyPath: raycastDistance
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 8723403608269948253, guid: d64862c172760884cb4a401c993ffd3d,
         type: 3}
