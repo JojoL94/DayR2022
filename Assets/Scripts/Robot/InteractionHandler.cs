@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using ExitGames.Client.Photon.StructWrapping;
 using UnityEngine;
 using Fusion;
 using TMPro;
@@ -10,6 +11,7 @@ public class InteractionHandler : NetworkBehaviour
     [Header("Collision")] public LayerMask collisionLayers;
 
     //Other components
+    LocalCameraHandler localCameraHandler;
     HPHandler hpHandler;
     NetworkPlayer networkPlayer;
     NetworkObject networkObject;
@@ -23,6 +25,7 @@ public class InteractionHandler : NetworkBehaviour
         hpHandler = GetComponent<HPHandler>();
         networkPlayer = GetBehaviour<NetworkPlayer>();
         networkObject = GetComponent<NetworkObject>();
+        localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
     }
 
     public override void FixedUpdateNetwork()
@@ -43,7 +46,7 @@ public class InteractionHandler : NetworkBehaviour
         Debug.Log("Try Interact");
         float hitDistance = 5;
         Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, hitDistance, Object.InputAuthority,
-            out var hitinfo, collisionLayers, HitOptions.None);
+            out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority);
 
         bool isInteractableObject = false;
 
@@ -53,13 +56,32 @@ public class InteractionHandler : NetworkBehaviour
         {
             Debug.Log($"{Time.time} {transform.name} hit hitbox {hitinfo.Hitbox.transform.root.name}");
 
+
+            isInteractableObject = true;
+            if (hitinfo.Hitbox.tag == "Door")
+            {
+                hitinfo.Hitbox.transform.root.GetComponent<RobotHandler>().OpenCloseDoor();
+            }
+            else if (hitinfo.Hitbox.tag == "RobotDriver")
+            {
+                //RobotHandler Driver einrichten
+                //Character Movement Handler einrichten
+                GetComponent<CharacterMovementHandler>().inDrivingMode = true;
+                localCameraHandler.SetNetworkCharacterPrototypeCustom(
+                    hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
+                    hitinfo.Hitbox.gameObject.transform);
+                GetComponent<CharacterMovementHandler>().SetNetworkCharacterPrototypeCustom(
+                    hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(),
+                    hitinfo.Hitbox.gameObject.transform);
+                hitinfo.Hitbox.Root.GetComponent<RobotHandler>()
+                    .SetUpDriver(Object.InputAuthority, networkPlayer.nickName.ToString());
+            }
+            else if (hitinfo.Hitbox.tag == "RobotGunner")
+            {
+            }
+
             if (Object.HasStateAuthority)
             {
-                isInteractableObject = true;
-                if (hitinfo.Hitbox.tag == "Door")
-                {
-                    hitinfo.Hitbox.transform.root.GetComponent<RobotHandler>().OpenCloseDoor();
-                } 
             }
         }
 
@@ -106,5 +128,6 @@ public class InteractionHandler : NetworkBehaviour
     void OnInteractRemote()
     {
         //Mach gedöns... Animation zeug oder so
+        //Idee Rotes licht am Kopf oder so geht an
     }
 }

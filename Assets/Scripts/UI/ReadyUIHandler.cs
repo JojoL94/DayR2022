@@ -11,9 +11,14 @@ public class ReadyUIHandler : NetworkBehaviour
     [Header("UI")] public TextMeshProUGUI buttonReadyText;
     public TextMeshProUGUI buttonRobotSpawnText;
     public TextMeshProUGUI countDownText;
+    public NetworkObject robotPrefab;
+    public NetworkObject robot;
+    public Button robotCustomizButton0;
+    public Button robotCustomizButton1;
+    public Button robotCustomizButton2;
+    public Button robotCustomizButton3;
 
     bool isReady = false;
-    private bool robotAllreadySpawned = false;
 
     Vector3 desiredCameraPosition = new Vector3(0, 5, 20);
 
@@ -23,10 +28,20 @@ public class ReadyUIHandler : NetworkBehaviour
     [Networked(OnChanged = nameof(OnCountdownChanged))]
     byte countDown { get; set; }
 
+    [Networked] public bool robotAllreadySpawned { get; set; }
+
     // Start is called before the first frame update
     void Start()
     {
         countDownText.text = "";
+        robotCustomizButton0.enabled = false;
+        robotCustomizButton1.enabled = false;
+        robotCustomizButton2.enabled = false;
+        robotCustomizButton3.enabled = false;
+        if (robotAllreadySpawned)
+        {
+            robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
+        }
     }
 
     void Update()
@@ -37,7 +52,6 @@ public class ReadyUIHandler : NetworkBehaviour
         {
             desiredCameraPosition = new Vector3(NetworkPlayer.Local.transform.position.x, 0.95f, 5);
             lerpSpeed = 7;
-
         }
         else
         {
@@ -65,8 +79,8 @@ public class ReadyUIHandler : NetworkBehaviour
         //Lock the session, so no other client can join
         Runner.SessionInfo.IsOpen = false;
 
-        GameObject[]  gameObjectsToTransfer = GameObject.FindGameObjectsWithTag("Player");
-        GameObject  robot = GameObject.FindGameObjectWithTag("Robot");
+        GameObject[] gameObjectsToTransfer = GameObject.FindGameObjectsWithTag("Player");
+        GameObject robot = GameObject.FindGameObjectWithTag("Robot");
         DontDestroyOnLoad(robot);
 
         foreach (GameObject gameObjectToTransfer in gameObjectsToTransfer)
@@ -112,30 +126,51 @@ public class ReadyUIHandler : NetworkBehaviour
 
         NetworkPlayer.Local.GetComponent<CharacterOutfitHandler>().OnCycleRightArm();
     }
+
     /**************** Robot ****************/
     public void OnSpawnRobot()
     {
         if (isReady)
             return;
-        
+
         if (!robotAllreadySpawned)
         {
-            NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().SetUpCharacterRobotHandler(true);
-            buttonRobotSpawnText.text = "Spawn Robot?";
-            robotAllreadySpawned = true;
+            Debug.Log("Roboter soll gespawned werden");
+            robot = Runner.Spawn(robotPrefab,
+                NetworkPlayer.Local.transform.position + NetworkPlayer.Local.transform.forward * -15f,
+                Quaternion.identity, null,
+                (runner, spawnedRobot) =>
+                {
+                    /*Hier kann ein Script vor dem Spawn ausgeführt werden.*/
+                });
+
+            if (robot != null)
+            {
+                robotCustomizButton0.enabled = true;
+                robotCustomizButton1.enabled = true;
+                robotCustomizButton2.enabled = true;
+                robotCustomizButton3.enabled = true;
+                buttonRobotSpawnText.text = "--";
+                robotAllreadySpawned = true;
+            }
         }
-        if (robotAllreadySpawned)
+        else
         {
+            robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
+            robotCustomizButton0.enabled = true;
+            robotCustomizButton1.enabled = true;
+            robotCustomizButton2.enabled = true;
+            robotCustomizButton3.enabled = true;
             buttonRobotSpawnText.text = "--";
         }
     }
-    
+
     public void OnChangeRobotKanone()
     {
         if (isReady)
             return;
 
-        NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().OnCycleKanone();
+        robot.GetComponent<RobotCustomizerHandler>().OnCycleKanone();
     }
 
     public void OnChangeRobotHuelle()
@@ -143,7 +178,7 @@ public class ReadyUIHandler : NetworkBehaviour
         if (isReady)
             return;
 
-        NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().OnCycleHuelle();
+        robot.GetComponent<RobotCustomizerHandler>().OnCycleHuelle();
     }
 
     public void OnChangeRobotInterior()
@@ -151,7 +186,7 @@ public class ReadyUIHandler : NetworkBehaviour
         if (isReady)
             return;
 
-        NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().OnCycleInterior();
+        robot.GetComponent<RobotCustomizerHandler>().OnCycleInterior();
     }
 
     public void OnChangeRobotLeg()
@@ -159,7 +194,7 @@ public class ReadyUIHandler : NetworkBehaviour
         if (isReady)
             return;
 
-        NetworkPlayer.Local.GetComponent<CharacterRobotHandler>().OnCycleLeg();
+        robot.GetComponent<RobotCustomizerHandler>().OnCycleLeg();
     }
 
     public void OnReady()
@@ -183,6 +218,7 @@ public class ReadyUIHandler : NetworkBehaviour
                 countDown = 0;
             }
         }
+
         NetworkPlayer.Local.GetComponent<CharacterOutfitHandler>().OnReady(isReady);
     }
 

@@ -55,10 +55,10 @@ MonoBehaviour:
     RawGuidValue: e4f20bae473c67846bd49841d1e8a7a4
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 4309730882270897851}
-  - {fileID: 3152148272024851502}
   - {fileID: 4090153816028980582}
+  - {fileID: 4309730882270897851}
   - {fileID: 9200489287297889040}
+  - {fileID: 3152148272024851502}
   SimulationBehaviours: []
 --- !u!1 &3416438840135552002
 GameObject:

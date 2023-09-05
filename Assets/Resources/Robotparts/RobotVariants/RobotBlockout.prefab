@@ -90,10 +90,10 @@ MonoBehaviour:
     RawGuidValue: 3a0026eae67a6144393f0c1d53d6d248
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 3885431449920316559}
-  - {fileID: 2709548567601550874}
   - {fileID: 3956354065938884434}
+  - {fileID: 3885431449920316559}
   - {fileID: 8181451130048704804}
+  - {fileID: 2709548567601550874}
   SimulationBehaviours: []
 --- !u!1001 &3082244770744107786
 PrefabInstance:

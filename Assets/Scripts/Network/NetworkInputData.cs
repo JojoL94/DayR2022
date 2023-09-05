@@ -12,4 +12,6 @@ public struct NetworkInputData : INetworkInput
     public NetworkBool isFireButtonPressed;
     public NetworkBool isGrenadeFireButtonPressed;
     public NetworkBool isRocketLauncherFireButtonPressed;
+    public NetworkBool isRotateRightPressed;
+    public NetworkBool isRotateLeftPressed;
 }

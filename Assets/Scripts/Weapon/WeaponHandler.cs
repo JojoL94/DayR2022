@@ -69,7 +69,7 @@ public class WeaponHandler : NetworkBehaviour
 
         StartCoroutine(FireEffectCO());
 
-        Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority);
+       Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority); 
 
         float hitDistance = 100;
         bool isHitOtherPlayer = false;

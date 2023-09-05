@@ -2679,7 +2679,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5306632466356233888}
         m_TargetAssemblyTypeName: ReadyUIHandler, Assembly-CSharp
-        m_MethodName: OnChangeCharacterBody
+        m_MethodName: OnChangeCharacterHead
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -3669,6 +3669,14 @@ MonoBehaviour:
   buttonReadyText: {fileID: 5306632466800879960}
   buttonRobotSpawnText: {fileID: 1108899358}
   countDownText: {fileID: 5306632466641543703}
+  robotPrefab: {fileID: 7857698369737885094, guid: 56af5ec42ab0de9429288ee8737b5e02,
+    type: 3}
+  robot: {fileID: 0}
+  robotCustomizButton0: {fileID: 1370382380}
+  robotCustomizButton1: {fileID: 638491544}
+  robotCustomizButton2: {fileID: 2018739027}
+  robotCustomizButton3: {fileID: 763015753}
+  _robotAllreadySpawned: 0
 --- !u!1 &5306632466641543700
 GameObject:
   m_ObjectHideFlags: 0

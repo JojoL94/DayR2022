@@ -8,6 +8,7 @@ TagManager:
   - ProcessQueue
   - Robot
   - Door
+  - RobotDriver
   layers:
   - Default
   - TransparentFX

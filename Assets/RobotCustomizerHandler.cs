@@ -6,11 +6,11 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class CharacterRobotHandler : NetworkBehaviour
+public class RobotCustomizerHandler : NetworkBehaviour
 {
-    [Header("Robot parts")] public NetworkObject robotPrefab;
-    public NetworkObject robot;
-    [SerializeField] GameObject robotKanone;
+    [Header("Robot parts")] [SerializeField]
+    GameObject robotKanone;
+
     [SerializeField] GameObject robotHuelle;
     [SerializeField] GameObject robotInterior;
     [SerializeField] GameObject robotLeg;
@@ -52,38 +52,19 @@ public class CharacterRobotHandler : NetworkBehaviour
     }
 
 
-    public void SetUpCharacterRobotHandler(bool spawnRobot)
+    public void Start()
     {
-        if (spawnRobot)
-        {
-            robot = Runner.Spawn(robotPrefab, transform.position + transform.forward * -15f, Quaternion.identity,
-                Object.StateAuthority,
-                (runner, spawnedRobot) => { spawnedRobot.GetComponent<RobotHandler>().SetUpRobotHandler(); });
-            robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
-            robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
-            robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
-            robotLeg = robot.transform.GetChild(0).transform.GetChild(3).gameObject;
+        if (SceneManager.GetActiveScene().name != "Ready")
+            return;
 
-            NetworkRobotParts newRobotParts = networkRobotParts;
-            RPC_RequestRobotPartsChange(newRobotParts);
-        }
-        else
-        {
-            if (robot == null)
-            {
-                Debug.Log("No robot found");
-            }
-            else
-            {
-                robotKanone = robot.transform.GetChild(0).transform.GetChild(0).gameObject;
-                robotHuelle = robot.transform.GetChild(0).transform.GetChild(1).gameObject;
-                robotInterior = robot.transform.GetChild(0).transform.GetChild(2).gameObject;
-                robotLeg = robot.transform.GetChild(0).transform.GetChild(3).gameObject;
+        NetworkRobotParts newRobotParts = networkRobotParts;
+        newRobotParts.kanonePrefabID = (byte)Random.Range(0, kanonePrefabs.Count);
+        newRobotParts.huellePrefabID = (byte)Random.Range(0, huellePrefabs.Count);
+        newRobotParts.interiorPrefabID = (byte)Random.Range(0, interiorPrefabs.Count);
+        newRobotParts.legPrefabID = (byte)Random.Range(0, legPrefabs.Count);
 
-                NetworkRobotParts newRobotParts = networkRobotParts;
-                RPC_RequestRobotPartsChange(newRobotParts);
-            }
-        }
+        RPC_RequestRobotPartsChange(newRobotParts);
+
     }
 
 
@@ -94,25 +75,12 @@ public class CharacterRobotHandler : NetworkBehaviour
         newPart.transform.parent = currentRobotPart.transform.parent;
         Utils.SetRenderLayerInChildren(newPart.transform, currentRobotPart.layer);
         Destroy(currentRobotPart);
-
+        GetComponent<RobotHandler>().SetUpLegs();
         return newPart;
     }
 
     void ReplaceRobotParts()
     {
-        if (robotKanone == null || robotHuelle == null || robotInterior == null || robotLeg == null)
-        {
-            if (GameObject.FindGameObjectWithTag("Robot") != null)
-            {
-                robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
-                SetUpCharacterRobotHandler(false);
-            }
-            else
-            {
-                SetUpCharacterRobotHandler(true);
-            }
-        }
-
         //Replace Kanone
         robotKanone = ReplaceRobotPart(robotKanone, kanonePrefabs[networkRobotParts.kanonePrefabID]);
 
@@ -125,20 +93,22 @@ public class CharacterRobotHandler : NetworkBehaviour
         //Replace Leg
         robotLeg = ReplaceRobotPart(robotLeg, legPrefabs[networkRobotParts.legPrefabID]);
 
+
         //GetComponent<HPHandler>().ResetMeshRenderers();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    [Rpc(RpcSources.All, RpcTargets.All)]
     void RPC_RequestRobotPartsChange(NetworkRobotParts newNetworkRobotParts, RpcInfo info = default)
     {
         Debug.Log(
             $"Received RPC_RequestRobotPartsChange for robot {transform.name}. KanoneID {newNetworkRobotParts.kanonePrefabID}");
 
         networkRobotParts = newNetworkRobotParts;
+
     }
 
 
-    static void OnRobotPartsChanged(Changed<CharacterRobotHandler> changed)
+    static void OnRobotPartsChanged(Changed<RobotCustomizerHandler> changed)
     {
         changed.Behaviour.OnRobotPartsChanged();
     }
@@ -146,6 +116,7 @@ public class CharacterRobotHandler : NetworkBehaviour
     private void OnRobotPartsChanged()
     {
         ReplaceRobotParts();
+
     }
 
 

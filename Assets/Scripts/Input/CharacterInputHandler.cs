@@ -12,6 +12,8 @@ public class CharacterInputHandler : MonoBehaviour
     bool isGrenadeFireButtonPressed = false;
     bool isRocketLauncherFireButtonPressed = false;
     bool isInteractModePressed = false;
+    bool isRotateLeftPressed = false;
+    bool isRotateRightPressed = false;
 
     //Other components
     LocalCameraHandler localCameraHandler;
@@ -74,6 +76,28 @@ public class CharacterInputHandler : MonoBehaviour
             isInteractModePressed = false;
         }
         
+        //Rotate Left
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            isRotateLeftPressed = true;
+        }
+        //Rotate Right
+        if (Input.GetKeyDown(KeyCode.E))
+        {
+            isRotateRightPressed = true;
+        }
+        
+        //Stop Rotate Left
+        if (Input.GetKeyUp(KeyCode.Q))
+        {
+            isRotateLeftPressed = false;
+        }
+        //Stop Rotate Right
+        if (Input.GetKeyUp(KeyCode.E))
+        {
+            isRotateRightPressed = false;
+        }
+        
         //Set view
         localCameraHandler.SetViewInputVector(viewInputVector);
     }
@@ -102,6 +126,13 @@ public class CharacterInputHandler : MonoBehaviour
 
         //InteractMode data
         networkInputData.isInteractModePressed = isInteractModePressed;
+        
+        //Rotate Right data
+        networkInputData.isRotateRightPressed = isRotateRightPressed;
+        
+        //Rotate Left data
+        networkInputData.isRotateLeftPressed = isRotateLeftPressed;
+        
         //Reset variables now that we have read their states
         isJumpButtonPressed = false;
         isFireButtonPressed = false;

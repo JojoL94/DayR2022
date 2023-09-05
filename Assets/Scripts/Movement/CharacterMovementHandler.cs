@@ -5,15 +5,14 @@ using Fusion;
 
 public class CharacterMovementHandler : NetworkBehaviour
 {
-    [Header("Animation")]
-    public Animator characterAnimator;
+    [Header("Animation")] public Animator characterAnimator;
 
     bool isRespawnRequested = false;
-
+    public bool inDrivingMode;
+    private Transform driverSeat;
     float walkSpeed = 0;
-
-    //Other components
-    NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
+    public List<LegTargetHandler> legTargetHandlers = new List<LegTargetHandler>();
+    NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom { get; set; }
     HPHandler hpHandler;
     LegTargetHandler legtargetHandler;
     NetworkInGameMessages networkInGameMessages;
@@ -57,31 +56,78 @@ public class CharacterMovementHandler : NetworkBehaviour
             Quaternion rotation = transform.rotation;
             rotation.eulerAngles = new Vector3(0, rotation.eulerAngles.y, rotation.eulerAngles.z);
             transform.rotation = rotation;
-
-            //Move
-            Vector3 moveDirection = transform.forward * networkInputData.movementInput.y + transform.right * networkInputData.movementInput.x;
-            moveDirection.Normalize();
-
-            networkCharacterControllerPrototypeCustom.Move(moveDirection);
-
-            //Jump
-            if(networkInputData.isJumpPressed)
-                networkCharacterControllerPrototypeCustom.Jump();
-
-            Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x, networkCharacterControllerPrototypeCustom.Velocity.z);
-            walkVector.Normalize();
-
-            walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
-
-            if (characterAnimator != null)
+            if (inDrivingMode)
             {
-                characterAnimator.SetFloat("walkSpeed", walkSpeed);
+                transform.position = driverSeat.position;
+                //Move
+                Vector3 moveDirection = driverSeat.transform.forward * networkInputData.movementInput.y +
+                                        transform.right * networkInputData.movementInput.x;
+                moveDirection.Normalize();
+
+                Vector3 animateMoveDirection = moveDirection;
+                networkCharacterControllerPrototypeCustom.Move(moveDirection, true);
+
+                // Rufe die Methode "AnimateRobotLeg()" in jedem der gesammelten Skripte auf
+                if (networkInputData.isRotateLeftPressed)
+                {
+                    networkCharacterControllerPrototypeCustom.Rotate(-1);
+                    animateMoveDirection = Vector3.zero;
+                }
+
+                if (networkInputData.isRotateRightPressed)
+                {
+                    networkCharacterControllerPrototypeCustom.Rotate(1);
+                    animateMoveDirection = Vector3.zero;
+                }
+                foreach (LegTargetHandler legTargetHandler in legTargetHandlers)
+                {
+                    legTargetHandler.AnimateRobotLeg(animateMoveDirection);
+                }
+
+                //Jump
+                if (networkInputData.isJumpPressed)
+                    networkCharacterControllerPrototypeCustom.Jump();
+
+                Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
+                    networkCharacterControllerPrototypeCustom.Velocity.z);
+                walkVector.Normalize();
+
+                walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
+
+                if (characterAnimator != null)
+                {
+                    characterAnimator.SetFloat("walkSpeed", walkSpeed);
+                }
             }
+            else
+            {
+                //Move
+                Vector3 moveDirection = transform.forward * networkInputData.movementInput.y +
+                                        transform.right * networkInputData.movementInput.x;
+                moveDirection.Normalize();
+
+                networkCharacterControllerPrototypeCustom.Move(moveDirection, false);
+
+                //Jump
+                if (networkInputData.isJumpPressed)
+                    networkCharacterControllerPrototypeCustom.Jump();
+
+                Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
+                    networkCharacterControllerPrototypeCustom.Velocity.z);
+                walkVector.Normalize();
+
+                walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
+
+                if (characterAnimator != null)
+                {
+                    characterAnimator.SetFloat("walkSpeed", walkSpeed);
+                }
+            }
+
 
             //Check if we've fallen off the world.
             CheckFallRespawn();
         }
-
     }
 
     void CheckFallRespawn()
@@ -96,7 +142,6 @@ public class CharacterMovementHandler : NetworkBehaviour
 
                 Respawn();
             }
-
         }
     }
 
@@ -119,4 +164,11 @@ public class CharacterMovementHandler : NetworkBehaviour
         networkCharacterControllerPrototypeCustom.Controller.enabled = isEnabled;
     }
 
+    public void SetNetworkCharacterPrototypeCustom(
+        NetworkCharacterControllerPrototypeCustom newNetworkCharacterControllerPrototypeCustom, Transform newDriverSeat)
+    {
+        networkCharacterControllerPrototypeCustom = newNetworkCharacterControllerPrototypeCustom;
+        driverSeat = newDriverSeat;
+        legTargetHandlers = driverSeat.root.GetComponent<RobotHandler>().legTargetHandlers;
+    }
 }
