@@ -7,6 +7,7 @@ public class CharacterInputHandler : MonoBehaviour
 {
     Vector2 moveInputVector = Vector2.zero;
     Vector2 viewInputVector = Vector2.zero;
+
     bool isJumpButtonPressed = false;
     bool isFireButtonPressed = false;
     bool isGrenadeFireButtonPressed = false;
@@ -14,8 +15,10 @@ public class CharacterInputHandler : MonoBehaviour
     bool isInteractModePressed = false;
     bool isRotateLeftPressed = false;
     bool isRotateRightPressed = false;
+    bool isScrollUp;
+    bool isScrollDown;
 
-    //Other components
+//Other components
     LocalCameraHandler localCameraHandler;
     CharacterMovementHandler characterMovementHandler;
 
@@ -24,12 +27,6 @@ public class CharacterInputHandler : MonoBehaviour
         localCameraHandler = GetComponentInChildren<LocalCameraHandler>();
         characterMovementHandler = GetComponent<CharacterMovementHandler>();
     }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-    }
-
 
     // Update is called once per frame
     void Update()
@@ -47,6 +44,23 @@ public class CharacterInputHandler : MonoBehaviour
         //Move input
         moveInputVector.x = Input.GetAxis("Horizontal");
         moveInputVector.y = Input.GetAxis("Vertical");
+        
+        //Scroll input
+        if (Input.GetAxis("Mouse ScrollWheel") > 0f ) // forward
+        {
+            isScrollUp = true;
+            isScrollDown = false;
+        }
+        else if (Input.GetAxis("Mouse ScrollWheel") < 0f ) // backwards
+        {
+            isScrollUp = false;
+            isScrollDown = true;
+        }
+        else if (Input.GetAxis("Mouse ScrollWheel") == 0f )
+        {
+            isScrollUp = false;
+            isScrollDown = false;
+        }
 
         //Jump
         if (Input.GetButtonDown("Jump"))
@@ -111,6 +125,10 @@ public class CharacterInputHandler : MonoBehaviour
 
         //Move data
         networkInputData.movementInput = moveInputVector;
+        
+        //Scroll data
+        networkInputData.isScrollUp = isScrollUp;
+        networkInputData.isScrollDown = isScrollDown;
 
         //Jump data
         networkInputData.isJumpPressed = isJumpButtonPressed;

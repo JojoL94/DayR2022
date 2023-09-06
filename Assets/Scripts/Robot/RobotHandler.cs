@@ -9,7 +9,6 @@ public class RobotHandler : NetworkBehaviour
     public LayerMask groundLayer; // Die Layer, auf denen sich der Charakter bewegt
     public Transform[] measurementPoints; // Die Punkte am Objekt, von denen aus gemessen wird
     public float rotationThreshold = 0.1f;
-    public List<LegTargetHandler> legTargetHandlers = new List<LegTargetHandler>();
 
     //Driver info
     PlayerRef driverIsPlayerRef;
@@ -21,7 +20,7 @@ public class RobotHandler : NetworkBehaviour
     [Networked] public bool doorProcess { get; set; }
     [Networked] public bool doorIsOpen { get; set; }
     [Networked] public bool engineOn { get; set; }
-
+    [Networked] public float heightValue { get; set; }
 
     [SerializeField] private Transform closedMarker;
     [SerializeField] private Transform openedMarker;
@@ -29,7 +28,8 @@ public class RobotHandler : NetworkBehaviour
     int doorSpeed = 5;
     private float moveSpeed = 5f;
     private bool movingUp;
-    private float heightValue = 3f;
+    public float minValue = 2f;
+    public float maxValue = 7f;
     private Vector3 targetHeight;
 
     public void Start()
@@ -37,7 +37,7 @@ public class RobotHandler : NetworkBehaviour
         closedMarker = transform.GetChild(1).GetChild(0).GetChild(0).transform;
         openedMarker = transform.GetChild(1).GetChild(0).GetChild(1).transform;
         doorTargetPosition = closedMarker;
-        SetUpLegs();
+        heightValue = 3f;
         // Du kannst jetzt auf die legTargetHandlers-Liste zugreifen, um auf die gesammelten Skripte zuzugreifen
         // Zum Beispiel: legTargetHandlers[0].DoSomething();
     }
@@ -188,21 +188,18 @@ public class RobotHandler : NetworkBehaviour
         if (!engineOn)
         {
             GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
-            // Rufe die Methode "AnimateRobotLeg()" in jedem der gesammelten Skripte auf
-            foreach (LegTargetHandler legTargetHandler in legTargetHandlers)
-            {
-                legTargetHandler.AnimateRobotLeg(Vector3.zero);
-            }
         }
         else
         {
             RaycastHit hit;
             if (Physics.Raycast(transform.position + new Vector3(0, 20f, 0), Vector3.down, out hit, Mathf.Infinity, groundLayer))
             {
+                // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
+                heightValue = Mathf.Clamp(heightValue, minValue, maxValue);
                 targetHeight = hit.point + new Vector3(0, heightValue - Vector3.Distance(transform.position, measurementPoints[0].position), 0);
-                if (Vector3.Distance(transform.position, targetHeight) > 0.2f)
+                if (Vector3.Distance(transform.position, targetHeight) > 0.1f)
                 {
-                    transform.position = Vector3.MoveTowards(transform.position, targetHeight, moveSpeed * Runner.DeltaTime);
+                    transform.position = Vector3.MoveTowards(transform.position, targetHeight, moveSpeed/2 * Runner.DeltaTime);
                 }
             }
         }
@@ -218,32 +215,4 @@ public class RobotHandler : NetworkBehaviour
         RPC_DriverChangeRequest(newDriverPlayerRef, newDriverPlayerName);
         RPC_EngineRequest(true);
     }
-
-    public void SetUpLegs()
-    {
-        legTargetHandlers.Clear();
-        // Finde alle Kindobjekte dieses GameObjects
-        Transform[] children = GetComponentsInChildren<Transform>();
-
-
-        foreach (Transform child in children)
-        {
-            // Überprüfe, ob das Kindobjekt ein Skript mit dem Namen "LegTargetHandler" hat
-            LegTargetHandler legTargetHandler = child.GetComponent<LegTargetHandler>();
-
-            if (legTargetHandler != null)
-            {
-                // Füge das gefundene Skript zur Liste hinzu
-                legTargetHandlers.Add(legTargetHandler);
-            }
-        }
-
-        // Überprüfe, ob die Liste mindestens 4 Elemente hat, bevor du sie kürzt
-        if (legTargetHandlers.Count >= 5)
-        {
-            // Entferne die Elemente von Position [0] bis [3]
-            legTargetHandlers.RemoveRange(0, 4);
-        }
-    }
-
 }

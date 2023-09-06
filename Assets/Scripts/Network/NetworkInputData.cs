@@ -14,4 +14,6 @@ public struct NetworkInputData : INetworkInput
     public NetworkBool isRocketLauncherFireButtonPressed;
     public NetworkBool isRotateRightPressed;
     public NetworkBool isRotateLeftPressed;
+    public NetworkBool isScrollUp;
+    public NetworkBool isScrollDown;
 }

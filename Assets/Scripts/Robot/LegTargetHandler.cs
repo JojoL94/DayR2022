@@ -8,7 +8,7 @@ using UnityEngine;
 public class LegTargetHandler : NetworkBehaviour
 {
     public float raycastDistance = 20f; // Die maximale Länge des Raycasts
-    public float offsetAmount = 1f; // Der Offset in Laufrichtung
+    public float offsetAmount = 0.5f; // Der Offset in Laufrichtung
     public LayerMask groundLayer;
     public Transform target;
     public Transform hipTarget;
@@ -25,6 +25,9 @@ public class LegTargetHandler : NetworkBehaviour
     private Vector3 oldStepMarker;
     private bool isMoving;
     private Vector3 movementDirection;
+    private Vector3 raycastDirection = Vector3.down;
+    private Vector3 currentPosition;
+    private Vector3 oldPosition;
     private float stepDistance = 4f;
     private bool middleStep;
     private bool isInDefaultPosition;
@@ -36,44 +39,55 @@ public class LegTargetHandler : NetworkBehaviour
 
     void Update()
     {
-        /*
-        // Offset für den Raycast je nach Bewegungsrichtung
+        currentPosition = transform.root.position;
+
+
+        if (Vector3.Distance(currentPosition, oldPosition) > 0.2f)
+        {
+            isMoving = true;
+
+            movementDirection = new Vector3(currentPosition.x, oldPosition.y, currentPosition.z) -
+                                oldPosition;
+            movementDirection.Normalize();
+        }
+        else
+        {
+            isMoving = false;
+        }
+
         Vector3 raycastDirection = Vector3.down;
 
 
-        // Normalisiere die Richtung (optional, falls du eine Einheitsrichtung benötigst)
         raycastDirection.Normalize();
+
         if (isMoving)
         {
             // Offset in Laufrichtung hinzufügen
             raycastDirection += movementDirection * offsetAmount;
-        }*/
-        // Berechne die Richtung vom Punkt A zu Punkt B
-
-        Vector3 movementDirection = Vector3.down;
-
-        if (Vector3.Distance(new Vector3(transform.position.x, target.position.y, transform.position.z),target.position) > stepDistance)
-        {
-            movementDirection =
-                new Vector3(transform.position.x, target.position.y, transform.position.z) - target.position;
-            movementDirection.Normalize();
         }
-        Vector3 raycastDirection = Vector3.down;
 
-        raycastDirection += movementDirection * offsetAmount;
+        if (!makeStep)
+        {
+            if (defaultPositionTickTimer.Expired(Runner))
+            {
+                defaultPositionTickTimer = TickTimer.CreateFromSeconds(Runner, 2);
+                oldPosition = currentPosition;
+            }
+        }
 
 
         RaycastHit hit;
         if (Physics.Raycast(transform.position, raycastDirection, out hit, Mathf.Infinity, groundLayer))
         {
-            targetHit = Vector3.MoveTowards(targetHit, hit.point, 10f * Time.deltaTime);
+            targetHit = Vector3.MoveTowards(targetHit, hit.point, 20f * Time.deltaTime);
             // Der Raycast hat den Boden getroffen
             Debug.DrawRay(transform.position, raycastDirection * raycastDistance, Color.green);
-            float distancePointTarget = Vector3.Distance(hit.point, target.position);
+            float distancePointTarget = Vector3.Distance(targetHit, target.position);
             if (distancePointTarget > stepDistance)
             {
                 if (!makeStep)
                 {
+                    oldPosition = currentPosition;
                     nextStepMarker = targetHit;
                     middleStepMarker = targetHit + new Vector3(0, transform.position.y / 2, 0);
                     middleStep = true;
@@ -81,7 +95,6 @@ public class LegTargetHandler : NetworkBehaviour
                     isInDefaultPosition = false;
                     moveSpeed = defaultMoveSpeed;
                     stepTimer = TickTimer.CreateFromSeconds(Runner, 2);
-                    defaultPositionTickTimer = TickTimer.CreateFromSeconds(Runner, 4);
                 }
                 else if (distancePointTarget > stepDistance * 2)
                 {
@@ -150,20 +163,6 @@ public class LegTargetHandler : NetworkBehaviour
             Debug.DrawRay(transform.position, raycastDirection * raycastDistance, Color.red);
 
             // Hier kannst du weitere Aktionen ausführen, wenn der Raycast nichts trifft
-        }
-    }
-
-    public void AnimateRobotLeg(Vector3 newMovementDirection)
-    {
-        if (newMovementDirection != Vector3.zero)
-        {
-            movementDirection = newMovementDirection;
-            isMoving = true;
-            isInDefaultPosition = false;
-        }
-        else
-        {
-            isMoving = false;
         }
     }
 }

@@ -8,10 +8,16 @@ public class CharacterMovementHandler : NetworkBehaviour
     [Header("Animation")] public Animator characterAnimator;
 
     bool isRespawnRequested = false;
+
+
     public bool inDrivingMode;
     private Transform driverSeat;
+    private Transform robot;
+    private RobotHandler robotHandler;
     float walkSpeed = 0;
-    public List<LegTargetHandler> legTargetHandlers = new List<LegTargetHandler>();
+    public float scrollSpeed = 0.3f;
+
+
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom { get; set; }
     HPHandler hpHandler;
     LegTargetHandler legtargetHandler;
@@ -64,29 +70,31 @@ public class CharacterMovementHandler : NetworkBehaviour
                                         transform.right * networkInputData.movementInput.x;
                 moveDirection.Normalize();
 
-                Vector3 animateMoveDirection = moveDirection;
                 networkCharacterControllerPrototypeCustom.Move(moveDirection, true);
-
-                // Rufe die Methode "AnimateRobotLeg()" in jedem der gesammelten Skripte auf
+                //Rotate Robot
                 if (networkInputData.isRotateLeftPressed)
                 {
                     networkCharacterControllerPrototypeCustom.Rotate(-1);
-                    animateMoveDirection = Vector3.zero;
                 }
 
                 if (networkInputData.isRotateRightPressed)
                 {
                     networkCharacterControllerPrototypeCustom.Rotate(1);
-                    animateMoveDirection = Vector3.zero;
-                }
-                foreach (LegTargetHandler legTargetHandler in legTargetHandlers)
-                {
-                    legTargetHandler.AnimateRobotLeg(animateMoveDirection);
                 }
 
-                //Jump
+                if (networkInputData.isScrollUp)
+                {
+                    robotHandler.heightValue += scrollSpeed;
+                }
+                else if (networkInputData.isScrollDown)
+                {
+                    robotHandler.heightValue -= scrollSpeed;
+                }
+
+                //Jump **HIER MUSS EINE BEDINGUNG REIN - DAS ALLE FÜßE UNTEN SIND**
                 if (networkInputData.isJumpPressed)
                     networkCharacterControllerPrototypeCustom.Jump();
+
 
                 Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
                     networkCharacterControllerPrototypeCustom.Velocity.z);
@@ -169,6 +177,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     {
         networkCharacterControllerPrototypeCustom = newNetworkCharacterControllerPrototypeCustom;
         driverSeat = newDriverSeat;
-        legTargetHandlers = driverSeat.root.GetComponent<RobotHandler>().legTargetHandlers;
+        robot = driverSeat.root.transform;
+        robotHandler = robot.GetComponent<RobotHandler>();
     }
 }

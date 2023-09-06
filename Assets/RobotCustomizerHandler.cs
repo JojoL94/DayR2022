@@ -75,7 +75,6 @@ public class RobotCustomizerHandler : NetworkBehaviour
         newPart.transform.parent = currentRobotPart.transform.parent;
         Utils.SetRenderLayerInChildren(newPart.transform, currentRobotPart.layer);
         Destroy(currentRobotPart);
-        GetComponent<RobotHandler>().SetUpLegs();
         return newPart;
     }
 
