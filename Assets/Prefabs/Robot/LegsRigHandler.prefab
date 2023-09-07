@@ -77,15 +77,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeda7bfbf984f2a4da5ab4b8967b115d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 0.5
+  m_Weight: 1
   m_Data:
     m_Root: {fileID: 7531327873609832407}
     m_Mid: {fileID: 5731126727020480237}
     m_Tip: {fileID: 2947762118755651353}
     m_Target: {fileID: 4506716224935620004}
     m_Hint: {fileID: 2774316734452476135}
-    m_TargetPositionWeight: 0.5
-    m_TargetRotationWeight: 1
+    m_TargetPositionWeight: 0.4
+    m_TargetRotationWeight: 0.3
     m_HintWeight: 1
     m_MaintainTargetPositionOffset: 0
     m_MaintainTargetRotationOffset: 0
@@ -229,15 +229,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeda7bfbf984f2a4da5ab4b8967b115d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 0.5
+  m_Weight: 1
   m_Data:
     m_Root: {fileID: 8289425935748472272}
     m_Mid: {fileID: 4446499306565395956}
     m_Tip: {fileID: 9213557973189238371}
     m_Target: {fileID: 1156682744517987128}
     m_Hint: {fileID: 5314408916533921931}
-    m_TargetPositionWeight: 0.5
-    m_TargetRotationWeight: 1
+    m_TargetPositionWeight: 0.4
+    m_TargetRotationWeight: 0.3
     m_HintWeight: 1
     m_MaintainTargetPositionOffset: 0
     m_MaintainTargetRotationOffset: 0
@@ -1087,15 +1087,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeda7bfbf984f2a4da5ab4b8967b115d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 0.5
+  m_Weight: 1
   m_Data:
     m_Root: {fileID: 6161974680608307393}
     m_Mid: {fileID: 6608592910846051962}
     m_Tip: {fileID: 926330004768292044}
     m_Target: {fileID: 3078697206211458358}
     m_Hint: {fileID: 2897692280611748595}
-    m_TargetPositionWeight: 0.5
-    m_TargetRotationWeight: 1
+    m_TargetPositionWeight: 0.4
+    m_TargetRotationWeight: 0.3
     m_HintWeight: 1
     m_MaintainTargetPositionOffset: 0
     m_MaintainTargetRotationOffset: 0
@@ -1548,15 +1548,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: aeda7bfbf984f2a4da5ab4b8967b115d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Weight: 0.5
+  m_Weight: 1
   m_Data:
     m_Root: {fileID: 2481939805332128319}
     m_Mid: {fileID: 2479001741277210682}
     m_Tip: {fileID: 8665574297401007139}
     m_Target: {fileID: 6897827237684359605}
     m_Hint: {fileID: 171249853400666677}
-    m_TargetPositionWeight: 0.5
-    m_TargetRotationWeight: 1
+    m_TargetPositionWeight: 0.4
+    m_TargetRotationWeight: 0.3
     m_HintWeight: 1
     m_MaintainTargetPositionOffset: 0
     m_MaintainTargetRotationOffset: 0

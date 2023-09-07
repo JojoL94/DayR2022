@@ -8,7 +8,7 @@ using UnityEngine;
 public class LegTargetHandler : NetworkBehaviour
 {
     public float raycastDistance = 20f; // Die maximale Länge des Raycasts
-    public float offsetAmount = 0.5f; // Der Offset in Laufrichtung
+
     public LayerMask groundLayer;
     public Transform target;
     public Transform hipTarget;
@@ -26,28 +26,30 @@ public class LegTargetHandler : NetworkBehaviour
     private bool isMoving;
     private Vector3 movementDirection;
     private Vector3 raycastDirection = Vector3.down;
-    private Vector3 currentPosition;
-    private Vector3 oldPosition;
-    private float stepDistance = 4f;
+    private Vector3 currentRobotPosition;
+    private Vector3 oldRobotPosition;
+
+    private float hipTargetValue = 2.3f;
+    private float stepDistance = 3f;
+    private float offsetAmount = 0.4f; // Der Offset in Laufrichtung
+
     private bool middleStep;
     private bool isInDefaultPosition;
     private Vector3 targetHit;
 
-    //Timing
-    TickTimer defaultPositionTickTimer = TickTimer.None;
+
     private TickTimer stepTimer = TickTimer.None;
 
     void Update()
     {
-        currentPosition = transform.root.position;
+        currentRobotPosition = transform.root.position;
 
-
-        if (Vector3.Distance(currentPosition, oldPosition) > 0.2f)
+        if (Vector3.Distance(currentRobotPosition, oldRobotPosition) > 0.2f)
         {
             isMoving = true;
 
-            movementDirection = new Vector3(currentPosition.x, oldPosition.y, currentPosition.z) -
-                                oldPosition;
+            movementDirection = new Vector3(currentRobotPosition.x, oldRobotPosition.y, currentRobotPosition.z) -
+                                oldRobotPosition;
             movementDirection.Normalize();
         }
         else
@@ -55,7 +57,7 @@ public class LegTargetHandler : NetworkBehaviour
             isMoving = false;
         }
 
-        Vector3 raycastDirection = Vector3.down;
+        raycastDirection = Vector3.down;
 
 
         raycastDirection.Normalize();
@@ -65,16 +67,16 @@ public class LegTargetHandler : NetworkBehaviour
             // Offset in Laufrichtung hinzufügen
             raycastDirection += movementDirection * offsetAmount;
         }
-
+/*
         if (!makeStep)
         {
             if (defaultPositionTickTimer.Expired(Runner))
             {
                 defaultPositionTickTimer = TickTimer.CreateFromSeconds(Runner, 2);
-                oldPosition = currentPosition;
+
             }
         }
-
+*/
 
         RaycastHit hit;
         if (Physics.Raycast(transform.position, raycastDirection, out hit, Mathf.Infinity, groundLayer))
@@ -87,9 +89,11 @@ public class LegTargetHandler : NetworkBehaviour
             {
                 if (!makeStep)
                 {
-                    oldPosition = currentPosition;
+                    oldRobotPosition = currentRobotPosition;
+
                     nextStepMarker = targetHit;
-                    middleStepMarker = targetHit + new Vector3(0, transform.position.y / 2, 0);
+                    middleStepMarker = new Vector3(transform.position.x, (transform.position.y + targetHit.y) / 2,
+                        transform.position.z);
                     middleStep = true;
                     makeStep = true;
                     isInDefaultPosition = false;
@@ -132,7 +136,7 @@ public class LegTargetHandler : NetworkBehaviour
                     target.position =
                         Vector3.MoveTowards(target.position, middleStepMarker, moveSpeed * Time.deltaTime);
 
-                    if (Vector3.Distance(target.position, middleStepMarker) < 1f)
+                    if (Vector3.Distance(target.position, middleStepMarker) < 0.3f)
                     {
                         middleStep = false;
                     }
@@ -155,7 +159,19 @@ public class LegTargetHandler : NetworkBehaviour
                 target.position = oldStepMarker;
             }
 
-            hipTarget.position = target.position + new Vector3(0, 4f, 0);
+            if (Physics.Raycast(target.position + new Vector3(0, 10, 0), Vector3.down, out hit, Mathf.Infinity,
+                    groundLayer))
+            {
+                hipTarget.position = target.position +
+                                     new Vector3(0, hipTargetValue - Vector3.Distance(target.position, hit.point), 0);
+                Debug.DrawRay(transform.position,
+                    (hipTarget.position - transform.position) *
+                    Vector3.Distance(hipTarget.position, transform.position), Color.cyan);
+            }
+            else
+            {
+                hipTarget.position = target.position + new Vector3(0, hipTargetValue, 0);
+            }
         }
         else
         {

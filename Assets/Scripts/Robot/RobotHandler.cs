@@ -20,7 +20,9 @@ public class RobotHandler : NetworkBehaviour
     [Networked] public bool doorProcess { get; set; }
     [Networked] public bool doorIsOpen { get; set; }
     [Networked] public bool engineOn { get; set; }
-    [Networked] public float heightValue { get; set; }
+    [Networked] public bool isRobotFalling { get; set; }
+    [Networked] public float targetHeightValue { get; set; }
+    
 
     [SerializeField] private Transform closedMarker;
     [SerializeField] private Transform openedMarker;
@@ -28,16 +30,18 @@ public class RobotHandler : NetworkBehaviour
     int doorSpeed = 5;
     private float moveSpeed = 5f;
     private bool movingUp;
-    public float minValue = 2f;
-    public float maxValue = 7f;
+    private float minHeight = 2.8f;
+    private float maxHeight = 4.3f;
     private Vector3 targetHeight;
+    private float heightValue;
+    private float smoothingHeightFactor = 0.1f; // Anpassbare Glättungsfaktor
 
     public void Start()
     {
         closedMarker = transform.GetChild(1).GetChild(0).GetChild(0).transform;
         openedMarker = transform.GetChild(1).GetChild(0).GetChild(1).transform;
         doorTargetPosition = closedMarker;
-        heightValue = 3f;
+        heightValue = (minHeight + maxHeight) / 2;
         // Du kannst jetzt auf die legTargetHandlers-Liste zugreifen, um auf die gesammelten Skripte zuzugreifen
         // Zum Beispiel: legTargetHandlers[0].DoSomething();
     }
@@ -162,7 +166,7 @@ public class RobotHandler : NetworkBehaviour
         foreach (Transform point in measurementPoints)
         {
             RaycastHit hit;
-            if (Physics.Raycast(point.position, Vector3.down, out hit, hitDistance, groundLayer))
+            if (Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer))
             {
                 averageNormal += hit.normal;
                 averageHeight += hit.distance;
@@ -192,18 +196,34 @@ public class RobotHandler : NetworkBehaviour
         else
         {
             RaycastHit hit;
-            if (Physics.Raycast(transform.position + new Vector3(0, 20f, 0), Vector3.down, out hit, Mathf.Infinity, groundLayer))
+            if (Physics.Raycast(measurementPoints[0].position + new Vector3(0,10,0), Vector3.down, out hit, Mathf.Infinity, groundLayer))
             {
-                // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
-                heightValue = Mathf.Clamp(heightValue, minValue, maxValue);
-                targetHeight = hit.point + new Vector3(0, heightValue - Vector3.Distance(transform.position, measurementPoints[0].position), 0);
-                if (Vector3.Distance(transform.position, targetHeight) > 0.1f)
+                if (Vector3.Distance(hit.point, measurementPoints[0].position) < maxHeight + 1f)
                 {
-                    transform.position = Vector3.MoveTowards(transform.position, targetHeight, moveSpeed/2 * Runner.DeltaTime);
+                    isRobotFalling = false;
+                    // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
+                    targetHeightValue = Mathf.Clamp(targetHeightValue, minHeight, maxHeight);
+                    // Glätte die Änderung des Float-Werts
+                    heightValue = Mathf.Lerp(heightValue, targetHeightValue, smoothingHeightFactor);
+                    targetHeight = hit.point + new Vector3(0,
+                        heightValue - Vector3.Distance(transform.position, measurementPoints[0].position), 0);
+                    if (Vector3.Distance(transform.position, targetHeight) > 0.1f)
+                    {
+                        transform.position = Vector3.MoveTowards(transform.position, targetHeight,
+                            moveSpeed / 2 * Runner.DeltaTime);
+                    }
+
                 }
+                else
+                {
+                    isRobotFalling = true;
+                    GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
+                }
+
+                Debug.DrawRay(measurementPoints[0].position,
+                    Vector3.down * Vector3.Distance(measurementPoints[0].position, hit.point), Color.green);
             }
         }
-
 
         if (Object.HasStateAuthority)
         {

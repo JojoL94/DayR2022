@@ -16,7 +16,8 @@ public class CharacterMovementHandler : NetworkBehaviour
     private RobotHandler robotHandler;
     float walkSpeed = 0;
     public float scrollSpeed = 0.3f;
-
+    public float smoothingHeightFactor = 0.1f; // Anpassbare Glättungsfaktor
+    private float smoothPilotSpeed = 0.8f; // Anpassbare Glättungsgeschwindigkeit
 
     NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom { get; set; }
     HPHandler hpHandler;
@@ -64,47 +65,58 @@ public class CharacterMovementHandler : NetworkBehaviour
             transform.rotation = rotation;
             if (inDrivingMode)
             {
-                transform.position = driverSeat.position;
-                //Move
-                Vector3 moveDirection = driverSeat.transform.forward * networkInputData.movementInput.y +
-                                        transform.right * networkInputData.movementInput.x;
-                moveDirection.Normalize();
+                // Berechne die gewünschte Position basierend auf dem Zielobjekt und dem Offset
+                Vector3 desiredPosition = driverSeat.position;
 
-                networkCharacterControllerPrototypeCustom.Move(moveDirection, true);
-                //Rotate Robot
-                if (networkInputData.isRotateLeftPressed)
+                // Verwende Lerp, um die Position allmählich an die gewünschte Position anzunähern
+                Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothPilotSpeed);
+
+                // Aktualisiere die Position des Objekts
+                transform.position = smoothedPosition;
+
+                if (!robotHandler.isRobotFalling)
                 {
-                    networkCharacterControllerPrototypeCustom.Rotate(-1);
-                }
+                    //Move
+                    Vector3 moveDirection = driverSeat.transform.forward * networkInputData.movementInput.y +
+                                            transform.right * networkInputData.movementInput.x;
+                    moveDirection.Normalize();
+                    
+                    networkCharacterControllerPrototypeCustom.Move(moveDirection, true);
+                    //Rotate Robot
+                    if (networkInputData.isRotateLeftPressed)
+                    {
+                        networkCharacterControllerPrototypeCustom.Rotate(-1);
+                    }
 
-                if (networkInputData.isRotateRightPressed)
-                {
-                    networkCharacterControllerPrototypeCustom.Rotate(1);
-                }
+                    if (networkInputData.isRotateRightPressed)
+                    {
+                        networkCharacterControllerPrototypeCustom.Rotate(1);
+                    }
 
-                if (networkInputData.isScrollUp)
-                {
-                    robotHandler.heightValue += scrollSpeed;
-                }
-                else if (networkInputData.isScrollDown)
-                {
-                    robotHandler.heightValue -= scrollSpeed;
-                }
+                    if (networkInputData.isScrollUp)
+                    {
+                        robotHandler.targetHeightValue += scrollSpeed;
+                    }
+                    else if (networkInputData.isScrollDown)
+                    {
+                        robotHandler.targetHeightValue -= scrollSpeed;
+                    }
 
-                //Jump **HIER MUSS EINE BEDINGUNG REIN - DAS ALLE FÜßE UNTEN SIND**
-                if (networkInputData.isJumpPressed)
-                    networkCharacterControllerPrototypeCustom.Jump();
+                    //Jump **HIER MUSS EINE BEDINGUNG REIN - DAS ALLE FÜßE UNTEN SIND**
+                    if (networkInputData.isJumpPressed)
+                        networkCharacterControllerPrototypeCustom.Jump();
 
 
-                Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
-                    networkCharacterControllerPrototypeCustom.Velocity.z);
-                walkVector.Normalize();
+                    Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
+                        networkCharacterControllerPrototypeCustom.Velocity.z);
+                    walkVector.Normalize();
 
-                walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
+                    walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
 
-                if (characterAnimator != null)
-                {
-                    characterAnimator.SetFloat("walkSpeed", walkSpeed);
+                    if (characterAnimator != null)
+                    {
+                        characterAnimator.SetFloat("walkSpeed", walkSpeed);
+                    }
                 }
             }
             else

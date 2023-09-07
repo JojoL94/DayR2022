@@ -427,7 +427,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 12, y: 1, z: 13}
+  m_Size: {x: 14, y: 1, z: 18}
   m_Center: {x: 0, y: 4.5, z: 0}
 --- !u!65 &590933076968590998
 BoxCollider:
@@ -494,10 +494,10 @@ MonoBehaviour:
   - {fileID: 5980625507980401318}
   - {fileID: 1634214659682489375}
   rotationThreshold: 0.1
-  legTargetHandlers: []
   _doorProcess: 0
   _doorIsOpen: 0
   _engineOn: 0
+  _targetHeightValue: 0
   closedMarker: {fileID: 0}
   openedMarker: {fileID: 0}
   doorTargetPosition: {fileID: 0}
