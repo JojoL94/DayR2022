@@ -605,6 +605,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cameraAnchorPoint: {fileID: 8609938973519135566}
+  initialRotationSpeed: 0
+  accelerationFactor: 0
+  rotationDelay: 0
+  driverSeat: {fileID: 0}
   localCamera: {fileID: 1024890751642113630}
 --- !u!1 &2284220096096563108
 GameObject:
@@ -1182,7 +1186,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 608fd48e02d64bb42bd65165c77c2ed2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _interpolationDataSource: 0
+  _interpolationDataSource: 3
   InterpolationSpace: 0
   InterpolationTarget: {fileID: 8054853945983303956}
   InterpolateErrorCorrection: 1
@@ -1377,7 +1381,6 @@ MonoBehaviour:
   collisionLayers:
     serializedVersion: 2
     m_Bits: 641
-  localCameraHandler: {fileID: 246120406805321715}
   _isInteracting: 0
 --- !u!1 &5276705138384389717
 GameObject:

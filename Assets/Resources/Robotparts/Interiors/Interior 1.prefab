@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3302555415880575920}
   - component: {fileID: 3089711732672833865}
   - component: {fileID: 4197752239111550074}
+  - component: {fileID: 6910113437473357835}
   m_Layer: 0
   m_Name: Sitz
   m_TagString: Untagged
@@ -83,6 +84,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &6910113437473357835
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2273384194568629286}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 3328972967498853522, guid: 7046fb367c20fa3448a4aa363c40a1fc, type: 3}
 --- !u!1 &4575162249799757580
 GameObject:
   m_ObjectHideFlags: 0
@@ -114,7 +137,6 @@ Transform:
   m_Children:
   - {fileID: 3531340672886294205}
   - {fileID: 2933872743398384422}
-  - {fileID: 1426541911677853907}
   - {fileID: 3302555415880575920}
   - {fileID: 8530027833749709150}
   m_Father: {fileID: 0}
@@ -130,6 +152,7 @@ GameObject:
   - component: {fileID: 8530027833749709150}
   - component: {fileID: 1191306925070233334}
   - component: {fileID: 4208822629054052136}
+  - component: {fileID: 3915152678698435183}
   m_Layer: 0
   m_Name: Sitz.001
   m_TagString: Untagged
@@ -202,6 +225,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &3915152678698435183
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015596340568316869}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 3189673764389261095, guid: 7046fb367c20fa3448a4aa363c40a1fc, type: 3}
 --- !u!1 &5562543641960458162
 GameObject:
   m_ObjectHideFlags: 0
@@ -213,6 +258,7 @@ GameObject:
   - component: {fileID: 3531340672886294205}
   - component: {fileID: 2320412122334495325}
   - component: {fileID: 8400357816428624208}
+  - component: {fileID: 507047296037222838}
   m_Layer: 0
   m_Name: BlockoutMunitionskiste
   m_TagString: Untagged
@@ -285,89 +331,28 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!1 &5786441591194136052
-GameObject:
+--- !u!64 &507047296037222838
+MeshCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1426541911677853907}
-  - component: {fileID: 3151889896496163954}
-  - component: {fileID: 6117329609774313574}
-  m_Layer: 0
-  m_Name: BlockoutRoboterArm1
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1426541911677853907
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5786441591194136052}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.14000572, y: 0.4123061, z: 0.87630504, w: -0.20613487}
-  m_LocalPosition: {x: 0.0031766891, y: 9.100001, z: -0.93814087}
-  m_LocalScale: {x: 24, y: 24, z: 24}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1541772273007827889}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &3151889896496163954
-MeshFilter:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5786441591194136052}
-  m_Mesh: {fileID: -8897758554723795265, guid: 7046fb367c20fa3448a4aa363c40a1fc, type: 3}
---- !u!23 &6117329609774313574
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5786441591194136052}
+  m_GameObject: {fileID: 5562543641960458162}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
   m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 257
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 70c8f1fced6ce5e4ea078b0dba9d977e, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 1239690846826844225, guid: 7046fb367c20fa3448a4aa363c40a1fc, type: 3}
 --- !u!1 &8499698452019202757
 GameObject:
   m_ObjectHideFlags: 0
@@ -379,6 +364,7 @@ GameObject:
   - component: {fileID: 2933872743398384422}
   - component: {fileID: 8669185447136771446}
   - component: {fileID: 2455188659536996786}
+  - component: {fileID: 2777956025790506986}
   m_Layer: 0
   m_Name: BlockoutMunitionskiste2
   m_TagString: Untagged
@@ -451,3 +437,25 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!64 &2777956025790506986
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8499698452019202757}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: -765999213821259902, guid: 7046fb367c20fa3448a4aa363c40a1fc, type: 3}

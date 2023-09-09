@@ -17,7 +17,7 @@ public class LocalCameraHandler : MonoBehaviour
     public float initialRotationSpeed; // Die anfängliche Rotationsgeschwindigkeit
     public float accelerationFactor; // Der Beschleunigungsfaktor für die Geschwindigkeitszunahme
     public float rotationDelay;
-    
+
     private Quaternion initialRotation; // Die anfängliche Rotation des eigenen Objekts
     private float currentRotationSpeed; // Die aktuelle Rotationsgeschwindigkeit
 
@@ -31,7 +31,8 @@ public class LocalCameraHandler : MonoBehaviour
     private void Awake()
     {
         localCamera = GetComponent<Camera>();
-        localNetworkCharacterControllerPrototypeCustom = GetComponentInParent<NetworkCharacterControllerPrototypeCustom>();
+        localNetworkCharacterControllerPrototypeCustom =
+            GetComponentInParent<NetworkCharacterControllerPrototypeCustom>();
         networkCharacterControllerPrototypeCustom = localNetworkCharacterControllerPrototypeCustom;
     }
 
@@ -75,10 +76,12 @@ public class LocalCameraHandler : MonoBehaviour
 
             // Erhöhe die Rotationsgeschwindigkeit basierend auf der Differenz
             currentRotationSpeed =
-                Mathf.Min(currentRotationSpeed + angleDifference * accelerationFactor, localNetworkCharacterControllerPrototypeCustom.rotationSpeed - rotationDelay);
+                Mathf.Min(currentRotationSpeed + angleDifference * accelerationFactor,
+                    localNetworkCharacterControllerPrototypeCustom.rotationSpeed - rotationDelay);
 
             // Maus-Input für die zusätzliche Rotation
-            cameraRotationY += viewInput.x * Time.deltaTime * localNetworkCharacterControllerPrototypeCustom.rotationSpeed;
+            cameraRotationY += viewInput.x * Time.deltaTime *
+                               localNetworkCharacterControllerPrototypeCustom.rotationSpeed;
             Quaternion mouseRotation = Quaternion.Euler(cameraRotationX, cameraRotationY, 0f);
 
             // Kombiniere die Rotationen (Zielrotation, Mausrotation)
@@ -90,7 +93,8 @@ public class LocalCameraHandler : MonoBehaviour
         }
         else
         {
-            cameraRotationY += viewInput.x * Time.deltaTime * localNetworkCharacterControllerPrototypeCustom.rotationSpeed;
+            cameraRotationY += viewInput.x * Time.deltaTime *
+                               localNetworkCharacterControllerPrototypeCustom.rotationSpeed;
             //Apply rotation
             localCamera.transform.rotation = Quaternion.Euler(cameraRotationX, cameraRotationY, 0);
         }
@@ -111,11 +115,20 @@ public class LocalCameraHandler : MonoBehaviour
     }
 
     public void SetNetworkCharacterPrototypeCustom(
-        NetworkCharacterControllerPrototypeCustom newNetworkCharacterControllerPrototypeCustom, bool newInDrivingMode,
+        NetworkCharacterControllerPrototypeCustom newNetworkCharacterControllerPrototypeCustom, bool newInRobot,
         Transform newDriverSeat)
     {
-        networkCharacterControllerPrototypeCustom = newNetworkCharacterControllerPrototypeCustom;
+        if (newInRobot)
+        {
+            networkCharacterControllerPrototypeCustom = newNetworkCharacterControllerPrototypeCustom;
+        }
+        else
+        {
+            networkCharacterControllerPrototypeCustom =
+                transform.root.GetComponent<NetworkCharacterControllerPrototypeCustom>();
+        }
+
         driverSeat = newDriverSeat;
-        inDrivingMode = newInDrivingMode;
+        inDrivingMode = newInRobot;
     }
 }

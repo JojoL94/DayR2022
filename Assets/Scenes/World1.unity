@@ -802,7 +802,7 @@ PrefabInstance:
     - target: {fileID: 239505825015880686, guid: 56af5ec42ab0de9429288ee8737b5e02,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 43.7
+      value: 7.450001
       objectReference: {fileID: 0}
     - target: {fileID: 239505825015880686, guid: 56af5ec42ab0de9429288ee8737b5e02,
         type: 3}
@@ -854,10 +854,15 @@ PrefabInstance:
       propertyPath: m_Name
       value: RobotBlockoutTexturiert
       objectReference: {fileID: 0}
+    - target: {fileID: 7114915075156089524, guid: 56af5ec42ab0de9429288ee8737b5e02,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7857698369737885094, guid: 56af5ec42ab0de9429288ee8737b5e02,
         type: 3}
       propertyPath: Flags
-      value: 2561
+      value: 133633
       objectReference: {fileID: 0}
     - target: {fileID: 7857698369737885094, guid: 56af5ec42ab0de9429288ee8737b5e02,
         type: 3}

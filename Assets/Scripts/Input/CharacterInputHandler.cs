@@ -69,11 +69,11 @@ public class CharacterInputHandler : MonoBehaviour
         //Fire
         if (Input.GetButtonDown("Fire1"))
             isFireButtonPressed = true;
-
-        //Fire
+/*
+        //Fire Rocket
         if (Input.GetButtonDown("Fire2"))
             isRocketLauncherFireButtonPressed = true;
-
+*/
         //Throw grenade
         if (Input.GetKeyDown(KeyCode.G))
             isGrenadeFireButtonPressed = true;

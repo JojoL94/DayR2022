@@ -7,8 +7,10 @@ using UnityEngine;
 public class RobotHandler : NetworkBehaviour
 {
     public LayerMask groundLayer; // Die Layer, auf denen sich der Charakter bewegt
-    public Transform[] measurementPoints; // Die Punkte am Objekt, von denen aus gemessen wird
     public float rotationThreshold = 0.1f;
+    public List<Transform> measurementPoints = new List<Transform>();
+    private Vector3Smoother smootherHeight = new Vector3Smoother(10); // Du kannst die Fenstergröße anpassen.
+    private Vector3Smoother smootherNormal = new Vector3Smoother(10); // Du kannst die Fenstergröße anpassen.
 
     //Driver info
     PlayerRef driverIsPlayerRef;
@@ -22,7 +24,7 @@ public class RobotHandler : NetworkBehaviour
     [Networked] public bool engineOn { get; set; }
     [Networked] public bool isRobotFalling { get; set; }
     [Networked] public float targetHeightValue { get; set; }
-    
+
 
     [SerializeField] private Transform closedMarker;
     [SerializeField] private Transform openedMarker;
@@ -30,11 +32,12 @@ public class RobotHandler : NetworkBehaviour
     int doorSpeed = 5;
     private float moveSpeed = 5f;
     private bool movingUp;
-    private float minHeight = 2.8f;
+    private float minHeight = 2f;
     private float maxHeight = 4.3f;
     private Vector3 targetHeight;
+    private Vector2 oldPositon;
     private float heightValue;
-    private float smoothingHeightFactor = 0.1f; // Anpassbare Glättungsfaktor
+    private float smoothingHeightFactor = 0.7f; // Anpassbare Glättungsfaktor
 
     public void Start()
     {
@@ -42,8 +45,8 @@ public class RobotHandler : NetworkBehaviour
         openedMarker = transform.GetChild(1).GetChild(0).GetChild(1).transform;
         doorTargetPosition = closedMarker;
         heightValue = (minHeight + maxHeight) / 2;
-        // Du kannst jetzt auf die legTargetHandlers-Liste zugreifen, um auf die gesammelten Skripte zuzugreifen
-        // Zum Beispiel: legTargetHandlers[0].DoSomething();
+        CollectAllMeasurementPoints(measurementPoints[0]);
+        oldPositon = new Vector2(transform.position.x, transform.position.z);
     }
 
     [Rpc(RpcSources.All, RpcTargets.All)]
@@ -92,6 +95,103 @@ public class RobotHandler : NetworkBehaviour
 
     //Network update
     public override void FixedUpdateNetwork()
+    {
+        DoorProcess();
+        Vector2 currentPosition = new Vector2(transform.position.x, transform.position.z);
+        if (currentPosition != oldPositon)
+        {
+            RotateRobotMotion();
+            oldPositon = transform.position;
+        }
+
+
+        if (!engineOn)
+        {
+            GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
+        }
+        else
+        {
+            HeightRobotMotion();
+        }
+
+        if (Object.HasStateAuthority)
+        {
+        }
+    }
+
+    public void HeightRobotMotion()
+    {
+        RaycastHit hit;
+        if (Physics.Raycast(measurementPoints[0].position, Vector3.down, out hit,
+                Mathf.Infinity, groundLayer))
+        {
+            if (Vector3.Distance(hit.point, measurementPoints[0].position) < maxHeight + 1f)
+            {
+                isRobotFalling = false;
+                // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
+                targetHeightValue = Mathf.Clamp(targetHeightValue, minHeight, maxHeight);
+                float hitYValue = 0;
+                if (hit.point.y < transform.position.y + 4f)
+                {
+                    hitYValue = hit.point.y;
+                }
+
+                // Glätte die Änderung des Float-Werts
+                heightValue = Mathf.Lerp(heightValue, targetHeightValue, smoothingHeightFactor);
+                heightValue = Mathf.Clamp(heightValue, minHeight - 1f, maxHeight + 1f);
+                targetHeight = new Vector3(transform.position.x, heightValue + hitYValue - 4f, transform.position.z);
+                Vector3 smoothedTargetHeight = smootherHeight.Smooth(targetHeight);
+                if (Vector3.Distance(transform.position, targetHeight) > 0.1f)
+                {
+                    transform.position = Vector3.MoveTowards(transform.position, smoothedTargetHeight,
+                        moveSpeed / 2 * Runner.DeltaTime);
+                }
+            }
+            else
+            {
+                isRobotFalling = true;
+                GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
+            }
+
+            Debug.DrawRay(measurementPoints[0].position,
+                Vector3.down * Vector3.Distance(measurementPoints[0].position, hit.point), Color.green);
+        }
+    }
+
+    private void RotateRobotMotion()
+    {
+        float hitDistance = 50;
+        Vector3 averageNormal = Vector3.zero;
+        float averageHeight = 0;
+
+        foreach (Transform point in measurementPoints)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer))
+            {
+                averageNormal += hit.normal;
+                averageHeight += hit.distance;
+            }
+        }
+
+        if (measurementPoints.Count > 0)
+        {
+            averageNormal /= measurementPoints.Count;
+            averageNormal.Normalize();
+            Vector3 smoothedAverageNormal = smootherNormal.Smooth(averageNormal);
+            Quaternion targetRotation =
+                Quaternion.FromToRotation(transform.up, smoothedAverageNormal) * transform.rotation;
+
+            // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
+            if (Quaternion.Angle(transform.rotation, targetRotation) > rotationThreshold)
+            {
+                // Objekt so ausrichten, dass die Up-Richtung der durchschnittlichen Oberflächennormalen entspricht
+                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Runner.DeltaTime * 5f);
+            }
+        }
+    }
+
+    private void DoorProcess()
     {
         if (doorProcess)
         {
@@ -157,82 +257,23 @@ public class RobotHandler : NetworkBehaviour
             /*transform.GetChild(0).GetChild(1).GetChild(0).transform.position =
                 doorTargetPosition.transform.position;*/
         }
+    }
 
-
-        float hitDistance = 50;
-        Vector3 averageNormal = Vector3.zero;
-        float averageHeight = 0;
-
-        foreach (Transform point in measurementPoints)
+    // Diese Methode sammelt rekursiv alle Child-Objekte.
+    public void CollectAllMeasurementPoints(Transform parent)
+    {
+        foreach (Transform child in parent)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer))
-            {
-                averageNormal += hit.normal;
-                averageHeight += hit.distance;
-            }
-        }
+            // Füge das Child-Objekt zur Liste hinzu.
+            measurementPoints.Add(child);
 
-        if (measurementPoints.Length > 0)
-        {
-            averageNormal /= measurementPoints.Length;
-            averageNormal.Normalize();
-            averageHeight /= measurementPoints.Length;
-
-            Quaternion targetRotation = Quaternion.FromToRotation(transform.up, averageNormal) * transform.rotation;
-
-            // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
-            if (Quaternion.Angle(transform.rotation, targetRotation) > rotationThreshold)
-            {
-                // Objekt so ausrichten, dass die Up-Richtung der durchschnittlichen Oberflächennormalen entspricht
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Runner.DeltaTime * 5f);
-            }
-        }
-
-        if (!engineOn)
-        {
-            GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
-        }
-        else
-        {
-            RaycastHit hit;
-            if (Physics.Raycast(measurementPoints[0].position + new Vector3(0,10,0), Vector3.down, out hit, Mathf.Infinity, groundLayer))
-            {
-                if (Vector3.Distance(hit.point, measurementPoints[0].position) < maxHeight + 1f)
-                {
-                    isRobotFalling = false;
-                    // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
-                    targetHeightValue = Mathf.Clamp(targetHeightValue, minHeight, maxHeight);
-                    // Glätte die Änderung des Float-Werts
-                    heightValue = Mathf.Lerp(heightValue, targetHeightValue, smoothingHeightFactor);
-                    targetHeight = hit.point + new Vector3(0,
-                        heightValue - Vector3.Distance(transform.position, measurementPoints[0].position), 0);
-                    if (Vector3.Distance(transform.position, targetHeight) > 0.1f)
-                    {
-                        transform.position = Vector3.MoveTowards(transform.position, targetHeight,
-                            moveSpeed / 2 * Runner.DeltaTime);
-                    }
-
-                }
-                else
-                {
-                    isRobotFalling = true;
-                    GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
-                }
-
-                Debug.DrawRay(measurementPoints[0].position,
-                    Vector3.down * Vector3.Distance(measurementPoints[0].position, hit.point), Color.green);
-            }
-        }
-
-        if (Object.HasStateAuthority)
-        {
+            // Rufe die Methode rekursiv für das Child-Objekt auf, um seine Kinder zu sammeln.
+            CollectAllMeasurementPoints(child);
         }
     }
 
-    public void SetUpDriver(PlayerRef newDriverPlayerRef, string newDriverPlayerName)
+    public void SetUpDriver(bool engineOn)
     {
-        RPC_DriverChangeRequest(newDriverPlayerRef, newDriverPlayerName);
-        RPC_EngineRequest(true);
+        RPC_EngineRequest(engineOn);
     }
 }

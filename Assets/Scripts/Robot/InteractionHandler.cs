@@ -64,20 +64,33 @@ public class InteractionHandler : NetworkBehaviour
             }
             else if (hitinfo.Hitbox.tag == "RobotDriver")
             {
-                //RobotHandler Driver einrichten
-                //Character Movement Handler einrichten
-                GetComponent<CharacterMovementHandler>().inDrivingMode = true;
                 localCameraHandler.SetNetworkCharacterPrototypeCustom(
                     hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
                     hitinfo.Hitbox.gameObject.transform);
-                GetComponent<CharacterMovementHandler>().SetNetworkCharacterPrototypeCustom(
+                GetComponent<CharacterMovementHandler>().SetCharacterMode(
                     hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(),
                     hitinfo.Hitbox.gameObject.transform);
                 hitinfo.Hitbox.Root.GetComponent<RobotHandler>()
-                    .SetUpDriver(Object.InputAuthority, networkPlayer.nickName.ToString());
+                    .SetUpDriver(true);
             }
             else if (hitinfo.Hitbox.tag == "RobotGunner")
             {
+                localCameraHandler.SetNetworkCharacterPrototypeCustom(
+                    hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
+                    hitinfo.Hitbox.gameObject.transform);
+                GetComponent<CharacterMovementHandler>().SetCharacterMode(null, hitinfo.Hitbox.gameObject.transform);
+            }
+            else if (hitinfo.Hitbox.tag == "RobotExit")
+            {
+                localCameraHandler.SetNetworkCharacterPrototypeCustom(
+                    null, false,
+                    null);
+                GetComponent<CharacterMovementHandler>().SetCharacterMode(
+                    null,
+                    null);
+                hitinfo.Hitbox.Root.GetComponent<RobotHandler>()
+                    .SetUpDriver(false);
+                transform.position = hitinfo.Hitbox.gameObject.transform.position;
             }
 
             if (Object.HasStateAuthority)

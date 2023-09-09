@@ -5,10 +5,11 @@ TagManager:
   serializedVersion: 2
   tags:
   - IgnoreLayerChange
-  - ProcessQueue
   - Robot
   - Door
   - RobotDriver
+  - RobotExit
+  - RobotGunner
   layers:
   - Default
   - TransparentFX
