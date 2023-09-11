@@ -15,15 +15,17 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform {
   public float maxSpeed      = 2.0f;
   public float rotationSpeed = 15.0f;
   public float viewUpDownRotationSpeed = 50.0f;
-
   [Networked]
   [HideInInspector]
   public bool IsGrounded { get; set; }
-
+  
+  [Networked]
+  [HideInInspector]
+  public bool LegsGrounded { get; set; }
   [Networked]
   [HideInInspector]
   public Vector3 Velocity { get; set; }
-
+  
   /// <summary>
   /// Sets the default teleport interpolation velocity to be the CC's current velocity.
   /// For more details on how this field is used, see <see cref="NetworkTransform.TeleportToPosition"/>.
@@ -109,6 +111,9 @@ public class NetworkCharacterControllerPrototypeCustom : NetworkTransform {
 
     if (direction == default) {
       horizontalVel = Vector3.Lerp(horizontalVel, default, braking * deltaTime);
+    }else if(!LegsGrounded)
+    {
+      horizontalVel = Vector3.Lerp(horizontalVel, default, braking/2 * deltaTime);
     } else {
       horizontalVel = Vector3.ClampMagnitude(horizontalVel + direction * acceleration * deltaTime, maxSpeed);
     }

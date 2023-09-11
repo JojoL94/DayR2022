@@ -7,15 +7,23 @@ using UnityEngine;
 
 public class LegTargetHandler : NetworkBehaviour
 {
+    public bool front;
+    public bool left;
     public float raycastDistance = 20f; // Die maximale Länge des Raycasts
-
     public LayerMask groundLayer;
     public Transform target;
     public Transform hipTarget;
     public bool makeStep;
 
-    public float
-        defaultMoveSpeed = 10f; //HIER UNBEDINGT SPEED ABGREIFEN VON CC ODER SO****************************************
+    private float
+        defaultMoveSpeed = 13f; //HIER UNBEDINGT SPEED ABGREIFEN VON CC ODER SO****************************************
+
+    public NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
+    public RobotHandler robotHandler;
+    public LegTargetHandler neighborLegHandlerLR;
+    public LegTargetHandler neighborLegHandlerBF;
+    private bool blockedByNeighborLR;
+    private bool blockedByNeighborBF;
 
     private float moveSpeedModifier;
     private float moveSpeed;
@@ -30,15 +38,21 @@ public class LegTargetHandler : NetworkBehaviour
     private Vector3 oldRobotPosition;
 
     private float hipTargetValue = 2.3f;
-    private float stepDistance = 3f;
-    private float offsetAmount = 0.4f; // Der Offset in Laufrichtung
+    private float stepDistance = 3.3f;
+    private float offsetAmount = 0.7f; // Der Offset in Laufrichtung
 
     private bool middleStep;
     private bool isInDefaultPosition;
     private Vector3 targetHit;
-
-
     private TickTimer stepTimer = TickTimer.None;
+
+    private void Start()
+    {
+        networkCharacterControllerPrototypeCustom = transform.root.GetComponent<NetworkCharacterControllerPrototypeCustom>();
+        robotHandler = transform.root.GetComponent<RobotHandler>();
+        defaultMoveSpeed = networkCharacterControllerPrototypeCustom.maxSpeed;
+
+    }
 
     void Update()
     {
@@ -67,16 +81,6 @@ public class LegTargetHandler : NetworkBehaviour
             // Offset in Laufrichtung hinzufügen
             raycastDirection += movementDirection * offsetAmount;
         }
-/*
-        if (!makeStep)
-        {
-            if (defaultPositionTickTimer.Expired(Runner))
-            {
-                defaultPositionTickTimer = TickTimer.CreateFromSeconds(Runner, 2);
-
-            }
-        }
-*/
 
         RaycastHit hit;
         if (Physics.Raycast(transform.position, raycastDirection, out hit, Mathf.Infinity, groundLayer))
@@ -85,45 +89,39 @@ public class LegTargetHandler : NetworkBehaviour
             // Der Raycast hat den Boden getroffen
             Debug.DrawRay(transform.position, raycastDirection * raycastDistance, Color.green);
             float distancePointTarget = Vector3.Distance(targetHit, target.position);
-            if (distancePointTarget > stepDistance)
-            {
-                if (!makeStep)
-                {
-                    oldRobotPosition = currentRobotPosition;
+            
+            bool inStepDistance = !(distancePointTarget > stepDistance);
+            bool makeStepBlocked = blockedByNeighborBF && blockedByNeighborLR;
+            bool ignoreBlocked = distancePointTarget > stepDistance*1.5f;
 
+            if (makeStep && blockedByNeighborLR && blockedByNeighborBF)
+            {
+                networkCharacterControllerPrototypeCustom.LegsGrounded = false;
+            }
+
+            if ((!inStepDistance && !makeStepBlocked) || ignoreBlocked) //Kontrolle ob sich das Bein zu weit weg befindet und ein Schritt gemacht werden soll
+            {
+                if (!makeStep) //Kontrolle ob ein Schritt gerade gemacht wird
+                {
+                    robotHandler.LegOffsetRotate(front,left,true);
+                    oldRobotPosition = currentRobotPosition;
                     nextStepMarker = targetHit;
-                    middleStepMarker = new Vector3(transform.position.x, (transform.position.y + targetHit.y) / 2,
-                        transform.position.z);
                     middleStep = true;
+                    neighborLegHandlerLR.blockedByNeighborLR = true;
+                    neighborLegHandlerBF.blockedByNeighborBF = true;
                     makeStep = true;
                     isInDefaultPosition = false;
                     moveSpeed = defaultMoveSpeed;
                     stepTimer = TickTimer.CreateFromSeconds(Runner, 2);
                 }
-                else if (distancePointTarget > stepDistance * 2)
+                else if
+                    (distancePointTarget > stepDistance * 4) //Kontrolle ob sich das Target am Arsch der Welt befindet
                 {
                     targetHit = transform.position;
                     target.position = transform.position;
                 }
-                else
-                {
-                    middleStep = false;
-                }
             }
 
-/*
-            if (distancePointTarget > 0.2f && defaultPositionTickTimer.Expired(Runner) && !makeStep)
-            {
-                nextStepMarker = targetHit;
-                middleStepMarker = targetHit + new Vector3(0, transform.position.y / 2, 0);
-                middleStep = true;
-                makeStep = true;
-                moveSpeed = defaultMoveSpeed;
-                isInDefaultPosition = true;
-                stepTimer = TickTimer.CreateFromSeconds(Runner, 2);
-                defaultPositionTickTimer = TickTimer.CreateFromSeconds(Runner, 2);
-            }
-*/
             if (makeStep)
             {
                 if (stepTimer.Expired(Runner))
@@ -133,10 +131,12 @@ public class LegTargetHandler : NetworkBehaviour
 
                 if (middleStep)
                 {
+                    middleStepMarker = new Vector3(transform.position.x, (transform.position.y + targetHit.y) / 2,
+                        transform.position.z);
                     target.position =
                         Vector3.MoveTowards(target.position, middleStepMarker, moveSpeed * Time.deltaTime);
 
-                    if (Vector3.Distance(target.position, middleStepMarker) < 0.3f)
+                    if (Vector3.Distance(target.position, middleStepMarker) < 0.2f)
                     {
                         middleStep = false;
                     }
@@ -151,6 +151,10 @@ public class LegTargetHandler : NetworkBehaviour
                 if (Vector3.Distance(nextStepMarker, target.position) < 0.1f)
                 {
                     oldStepMarker = nextStepMarker;
+                    neighborLegHandlerLR.blockedByNeighborLR = false;
+                    neighborLegHandlerBF.blockedByNeighborBF = false;
+                    networkCharacterControllerPrototypeCustom.LegsGrounded = true;
+                    robotHandler.LegOffsetRotate(front,left,false);
                     makeStep = false;
                 }
             }

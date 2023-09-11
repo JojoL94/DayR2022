@@ -36,6 +36,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        networkCharacterControllerPrototypeCustom.LegsGrounded = true;
     }
 
     public override void FixedUpdateNetwork()
@@ -127,91 +128,59 @@ public class CharacterMovementHandler : NetworkBehaviour
 
         if (!robotHandler.isRobotFalling)
         {
-            //Move
-            Vector3 moveDirection = robotSeat.transform.forward * networkInputData.movementInput.y +
-                                    transform.right * networkInputData.movementInput.x;
-            moveDirection.Normalize();
-
-            networkCharacterControllerPrototypeCustom.Move(moveDirection, true);
-            //Rotate Robot
-            if (networkInputData.isRotateLeftPressed)
+            if (!robotHandler.robotInGround)
             {
-                networkCharacterControllerPrototypeCustom.Rotate(-1);
+                //Move
+                Vector3 moveDirection = robotSeat.transform.forward * networkInputData.movementInput.y +
+                                        robotSeat.transform.right * networkInputData.movementInput.x;
+                moveDirection.Normalize();
+
+                networkCharacterControllerPrototypeCustom.Move(moveDirection, true);
+
+                //Rotate Robot
+                if (networkInputData.isRotateLeftPressed)
+                {
+                    networkCharacterControllerPrototypeCustom.Rotate(-1);
+                }
+
+                if (networkInputData.isRotateRightPressed)
+                {
+                    networkCharacterControllerPrototypeCustom.Rotate(1);
+                }
+
+                if (networkInputData.isScrollUp)
+                {
+                    robotHandler.targetHeightValue += scrollSpeed;
+                }
+                else if (networkInputData.isScrollDown)
+                {
+                    robotHandler.targetHeightValue -= scrollSpeed;
+                }
+
+                //Jump **HIER MUSS EINE BEDINGUNG REIN - DAS ALLE FÜßE UNTEN SIND**
+                if (networkInputData.isJumpPressed)
+                    networkCharacterControllerPrototypeCustom.Jump();
+
+
+                Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
+                    networkCharacterControllerPrototypeCustom.Velocity.z);
+                walkVector.Normalize();
+
+                walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
+
+                if (characterAnimator != null)
+                {
+                    characterAnimator.SetFloat("walkSpeed", walkSpeed);
+                }
             }
-
-            if (networkInputData.isRotateRightPressed)
+            else
             {
-                networkCharacterControllerPrototypeCustom.Rotate(1);
-            }
-
-            if (networkInputData.isScrollUp)
-            {
-                robotHandler.targetHeightValue += scrollSpeed;
-            }
-            else if (networkInputData.isScrollDown)
-            {
-                robotHandler.targetHeightValue -= scrollSpeed;
-            }
-
-            //Jump **HIER MUSS EINE BEDINGUNG REIN - DAS ALLE FÜßE UNTEN SIND**
-            if (networkInputData.isJumpPressed)
-                networkCharacterControllerPrototypeCustom.Jump();
-
-
-            Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
-                networkCharacterControllerPrototypeCustom.Velocity.z);
-            walkVector.Normalize();
-
-            walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
-
-            if (characterAnimator != null)
-            {
-                characterAnimator.SetFloat("walkSpeed", walkSpeed);
+                networkCharacterControllerPrototypeCustom.Move(Vector3.zero, true);
             }
         }
         else
         {
-            //Move
-            Vector3 moveDirection = robotSeat.transform.forward * networkInputData.movementInput.y +
-                                    transform.right * networkInputData.movementInput.x;
-            moveDirection.Normalize();
-
-            networkCharacterControllerPrototypeCustom.Move(moveDirection, false);
-            //Rotate Robot
-            if (networkInputData.isRotateLeftPressed)
-            {
-                networkCharacterControllerPrototypeCustom.Rotate(-1);
-            }
-
-            if (networkInputData.isRotateRightPressed)
-            {
-                networkCharacterControllerPrototypeCustom.Rotate(1);
-            }
-
-            if (networkInputData.isScrollUp)
-            {
-                robotHandler.targetHeightValue += scrollSpeed;
-            }
-            else if (networkInputData.isScrollDown)
-            {
-                robotHandler.targetHeightValue -= scrollSpeed;
-            }
-
-            //Jump **HIER MUSS EINE BEDINGUNG REIN - DAS ALLE FÜßE UNTEN SIND**
-            if (networkInputData.isJumpPressed)
-                networkCharacterControllerPrototypeCustom.Jump();
-
-
-            Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
-                networkCharacterControllerPrototypeCustom.Velocity.z);
-            walkVector.Normalize();
-
-            walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
-
-            if (characterAnimator != null)
-            {
-                characterAnimator.SetFloat("walkSpeed", walkSpeed);
-            }
+            networkCharacterControllerPrototypeCustom.Move(Vector3.zero, false);
         }
     }
 

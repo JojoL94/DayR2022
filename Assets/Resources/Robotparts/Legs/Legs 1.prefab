@@ -772,6 +772,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6931169863317699449}
   - component: {fileID: 4309466630335176345}
+  - component: {fileID: 7815632902676437523}
   m_Layer: 0
   m_Name: LowerLegRight
   m_TagString: Untagged
@@ -851,6 +852,28 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.023527924, y: 0.0150000015, z: 0.000007861061}
     m_Extent: {x: 0.009572487, y: 0.0022549415, z: 0.0030367025}
   m_DirtyAABB: 0
+--- !u!64 &7815632902676437523
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4243922402764785350}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &4369838633277089046
 GameObject:
   m_ObjectHideFlags: 0
@@ -861,6 +884,7 @@ GameObject:
   m_Component:
   - component: {fileID: 362811249476511172}
   - component: {fileID: 7168877116667120195}
+  - component: {fileID: 7302217103542264136}
   m_Layer: 0
   m_Name: LowerLegLeft
   m_TagString: Untagged
@@ -940,6 +964,28 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.02352792, y: 0.014999993, z: -0.000007862458}
     m_Extent: {x: 0.009572487, y: 0.0022549387, z: 0.0030367023}
   m_DirtyAABB: 0
+--- !u!64 &7302217103542264136
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4369838633277089046}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &4841600602978186933
 GameObject:
   m_ObjectHideFlags: 0
@@ -950,6 +996,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6002497955183006326}
   - component: {fileID: 3796025925756004598}
+  - component: {fileID: 3262931385099165668}
   m_Layer: 0
   m_Name: LowerLegLeft.001
   m_TagString: Untagged
@@ -1029,6 +1076,28 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.02352792, y: 0.014999997, z: -0.000007851981}
     m_Extent: {x: 0.00957249, y: 0.0022549387, z: 0.003036707}
   m_DirtyAABB: 0
+--- !u!64 &3262931385099165668
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4841600602978186933}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &4846183249341273414
 GameObject:
   m_ObjectHideFlags: 0
@@ -1128,6 +1197,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4002102031200501660}
   - component: {fileID: 6095971307451423095}
+  - component: {fileID: 8672328190824772241}
   m_Layer: 0
   m_Name: LowerLegRight.001
   m_TagString: Untagged
@@ -1207,6 +1277,28 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.02352792, y: 0.015000007, z: 0.000007859198}
     m_Extent: {x: 0.009572487, y: 0.0022549415, z: 0.0030367025}
   m_DirtyAABB: 0
+--- !u!64 &8672328190824772241
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5003845638780742008}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 0}
 --- !u!1 &5307719011935224701
 GameObject:
   m_ObjectHideFlags: 0

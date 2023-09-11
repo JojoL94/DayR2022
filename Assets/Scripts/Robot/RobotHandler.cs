@@ -23,84 +23,70 @@ public class RobotHandler : NetworkBehaviour
     [Networked] public bool doorIsOpen { get; set; }
     [Networked] public bool engineOn { get; set; }
     [Networked] public bool isRobotFalling { get; set; }
+    [Networked] public bool robotInGround { get; set; }
     [Networked] public float targetHeightValue { get; set; }
 
 
     [SerializeField] private Transform closedMarker;
     [SerializeField] private Transform openedMarker;
     [SerializeField] private Transform doorTargetPosition;
-    int doorSpeed = 5;
-    private float moveSpeed = 5f;
+
+    private float doorSpeed = 5f;
+    private float moveSpeed = 10f;
+
+    public float robotYOffset;
     private bool movingUp;
     private float minHeight = 2f;
-    private float maxHeight = 4.3f;
+    private float maxHeight = 4f;
+    private float heightValue;
     private Vector3 targetHeight;
     private Vector2 oldPositon;
-    private float heightValue;
+    private Vector3 targetOnGround;
+
     private float smoothingHeightFactor = 0.7f; // Anpassbare Glättungsfaktor
+    private Vector3 rotationOffset;
+    private float rotationSpeed = 2f;
+    private float rotationOffsetValue = 15f;
+
+    private NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
 
     public void Start()
     {
         closedMarker = transform.GetChild(1).GetChild(0).GetChild(0).transform;
         openedMarker = transform.GetChild(1).GetChild(0).GetChild(1).transform;
         doorTargetPosition = closedMarker;
-        heightValue = (minHeight + maxHeight) / 2;
         CollectAllMeasurementPoints(measurementPoints[0]);
         oldPositon = new Vector2(transform.position.x, transform.position.z);
+        rotationOffset = Vector3.zero;
+        robotYOffset = GetComponent<CharacterController>().center.y;
+        networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
     }
 
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_DoorOpenRequest(bool newDoorProcess, bool newDoorIsOpen)
-    {
-        doorProcess = newDoorProcess;
-        doorIsOpen = newDoorIsOpen;
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_EngineRequest(bool newEngineOn)
-    {
-        engineOn = newEngineOn;
-    }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_DriverChangeRequest(PlayerRef newDriverPlayerRef, String newDriverPlayerName)
-    {
-        driverIsPlayerRef = newDriverPlayerRef;
-        driverIsPlayerName = newDriverPlayerName;
-    }
-
-    public void OpenCloseDoor()
-    {
-        if (!doorProcess)
-        {
-            float dist = Vector3.Distance(transform.GetChild(0).GetChild(1).GetChild(0).transform.position,
-                closedMarker.transform.position);
-            if (dist < 0.3f)
-            {
-                RPC_DoorOpenRequest(true, false);
-            }
-            else
-            {
-                RPC_DoorOpenRequest(true, true);
-            }
-
-            doorProcess = true;
-        }
-        else
-        {
-            Debug.Log("Door is in Process");
-            //Eingabe abgelehnt
-        }
-    }
 
     //Network update
     public override void FixedUpdateNetwork()
     {
         DoorProcess();
+
+        float hitDistance = 50;
+        Vector3 averageNormal = Vector3.zero;
+        Vector3 averagePosition = Vector3.zero;
+
+        foreach (Transform point in measurementPoints)
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer))
+            {
+                averageNormal += hit.normal;
+                averagePosition += hit.point;
+            }
+        }
+
+        averagePosition /= measurementPoints.Count;
         Vector2 currentPosition = new Vector2(transform.position.x, transform.position.z);
         if (currentPosition != oldPositon)
         {
-            RotateRobotMotion();
+            RotateRobotMotion(averageNormal);
             oldPositon = transform.position;
         }
 
@@ -111,7 +97,12 @@ public class RobotHandler : NetworkBehaviour
         }
         else
         {
-            HeightRobotMotion();
+            // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
+            targetHeightValue = Mathf.Clamp(targetHeightValue, minHeight, maxHeight);
+            heightValue = Mathf.Lerp(heightValue, targetHeightValue, smoothingHeightFactor);
+            heightValue = Mathf.Clamp(heightValue, minHeight, maxHeight);
+
+            HeightRobotMotion(averagePosition.y + robotYOffset, heightValue - robotYOffset);
         }
 
         if (Object.HasStateAuthority)
@@ -119,61 +110,58 @@ public class RobotHandler : NetworkBehaviour
         }
     }
 
-    public void HeightRobotMotion()
+    public void HeightRobotMotion(float averageYPosition, float targetHeightAboveGround)
     {
-        RaycastHit hit;
-        if (Physics.Raycast(measurementPoints[0].position, Vector3.down, out hit,
-                Mathf.Infinity, groundLayer))
+        if (!robotInGround)
         {
-            if (Vector3.Distance(hit.point, measurementPoints[0].position) < maxHeight + 1f)
+            RaycastHit hit;
+            if (Physics.Raycast(
+                    new Vector3(transform.position.x, averageYPosition + targetHeightAboveGround, transform.position.z),
+                    Vector3.down, out hit, groundLayer))
             {
-                isRobotFalling = false;
-                // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
-                targetHeightValue = Mathf.Clamp(targetHeightValue, minHeight, maxHeight);
-                float hitYValue = 0;
-                if (hit.point.y < transform.position.y + 4f)
+                if (Vector3.Distance(hit.point, measurementPoints[0].position) > maxHeight + 0.3f)
                 {
-                    hitYValue = hit.point.y;
+                    isRobotFalling = true;
                 }
-
-                // Glätte die Änderung des Float-Werts
-                heightValue = Mathf.Lerp(heightValue, targetHeightValue, smoothingHeightFactor);
-                heightValue = Mathf.Clamp(heightValue, minHeight - 1f, maxHeight + 1f);
-                targetHeight = new Vector3(transform.position.x, heightValue + hitYValue - 4f, transform.position.z);
-                Vector3 smoothedTargetHeight = smootherHeight.Smooth(targetHeight);
-                if (Vector3.Distance(transform.position, targetHeight) > 0.1f)
+                else
                 {
-                    transform.position = Vector3.MoveTowards(transform.position, smoothedTargetHeight,
-                        moveSpeed / 2 * Runner.DeltaTime);
+                    isRobotFalling = false;
+
+                    float newYPosition = hit.point.y + targetHeightAboveGround;
+
+                    // Bewege das Objekt zur vorgegebenen Höhe über dem Boden (nur Y-Komponente ändern)
+                    Vector3 newPosition = new Vector3(transform.position.x, newYPosition, transform.position.z);
+                    Vector3 smoothedNewPosition = smootherHeight.Smooth(newPosition);
+                    transform.position = Vector3.MoveTowards(transform.position, smoothedNewPosition,
+                        Runner.DeltaTime * moveSpeed);
                 }
             }
-            else
+            else // Ist unter der Erde
             {
-                isRobotFalling = true;
-                GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
+                robotInGround = true;
+            }
+        }
+        else
+        {
+            RaycastHit hit;
+            if (Physics.Raycast(measurementPoints[0].position + Vector3.up * 20f, Vector3.down, out hit, Mathf.Infinity, groundLayer))
+            {
+                if (Vector3.Distance(transform.position,new Vector3(transform.position.x,hit.point.y - robotYOffset/2,transform.position.z)) < 0.3f)
+                {
+                    robotInGround = false;
+                }
+                else
+                {
+                    transform.position =
+                        Vector3.MoveTowards(transform.position,  new Vector3(transform.position.x,hit.point.y - robotYOffset/2,transform.position.z), Runner.DeltaTime * moveSpeed / 2);
+                }
             }
 
-            Debug.DrawRay(measurementPoints[0].position,
-                Vector3.down * Vector3.Distance(measurementPoints[0].position, hit.point), Color.green);
         }
     }
 
-    private void RotateRobotMotion()
+    private void RotateRobotMotion(Vector3 averageNormal)
     {
-        float hitDistance = 50;
-        Vector3 averageNormal = Vector3.zero;
-        float averageHeight = 0;
-
-        foreach (Transform point in measurementPoints)
-        {
-            RaycastHit hit;
-            if (Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer))
-            {
-                averageNormal += hit.normal;
-                averageHeight += hit.distance;
-            }
-        }
-
         if (measurementPoints.Count > 0)
         {
             averageNormal /= measurementPoints.Count;
@@ -181,18 +169,37 @@ public class RobotHandler : NetworkBehaviour
             Vector3 smoothedAverageNormal = smootherNormal.Smooth(averageNormal);
             Quaternion targetRotation =
                 Quaternion.FromToRotation(transform.up, smoothedAverageNormal) * transform.rotation;
-
             // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
             if (Quaternion.Angle(transform.rotation, targetRotation) > rotationThreshold)
             {
                 // Objekt so ausrichten, dass die Up-Richtung der durchschnittlichen Oberflächennormalen entspricht
-                transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, Runner.DeltaTime * 5f);
+                transform.rotation =
+                    Quaternion.Lerp(transform.rotation, targetRotation, Runner.DeltaTime * rotationSpeed);
+            }
+        }
+
+        if (engineOn)
+        {
+            Quaternion targetRotationOffset =
+                Quaternion.FromToRotation(transform.up, rotationOffset) * transform.rotation;
+            // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
+            if (Quaternion.Angle(transform.rotation, targetRotationOffset) > rotationThreshold)
+            {
+                // Objekt so ausrichten, dass die Up-Richtung der durchschnittlichen Oberflächennormalen entspricht
+                transform.rotation =
+                    Quaternion.Lerp(transform.rotation, targetRotationOffset, Runner.DeltaTime * (rotationSpeed / 20));
             }
         }
     }
 
     private void DoorProcess()
     {
+        Vector3 doorPosition = transform.GetChild(0).GetChild(1).GetChild(0).transform.position;
+        float distClosedMarker = Vector3.Distance(doorPosition,
+            closedMarker.transform.position);
+        float distOpenMarker = Vector3.Distance(doorPosition,
+            openedMarker.transform.position);
+
         if (doorProcess)
         {
             if (doorIsOpen)
@@ -205,29 +212,30 @@ public class RobotHandler : NetworkBehaviour
             }
 
             Vector3 moveDirection =
-                (doorTargetPosition.position - transform.GetChild(0).GetChild(1).GetChild(0).transform.position)
+                (doorTargetPosition.position - doorPosition)
                 .normalized;
             float distanceToTarget =
-                Vector3.Distance(transform.GetChild(0).GetChild(1).GetChild(0).transform.transform.position,
+                Vector3.Distance(doorPosition,
                     doorTargetPosition.position);
 
             if (distanceToTarget > 0.01f) // Ein kleiner Schwellenwert, um das "Angekommen"-Kriterium zu definieren
             {
-                transform.GetChild(0).GetChild(1).GetChild(0).transform.transform.position +=
-                    moveDirection * doorSpeed * Runner.DeltaTime;
+                transform.GetChild(0).GetChild(1).GetChild(0).transform.position = Vector3.MoveTowards(doorPosition,
+                    doorTargetPosition.position,
+                    doorSpeed * Runner.DeltaTime);
             }
             else
             {
-                float dist = Vector3.Distance(transform.GetChild(0).GetChild(1).GetChild(0).transform.position,
-                    closedMarker.transform.position);
-                if (dist < 0.3f)
+                if (distClosedMarker > distOpenMarker)
                 {
-                    RPC_DoorOpenRequest(false, false);
+                    doorIsOpen = true;
                 }
                 else
                 {
-                    RPC_DoorOpenRequest(false, true);
+                    doorIsOpen = false;
                 }
+
+                doorProcess = false;
             }
         }
         else
@@ -242,25 +250,23 @@ public class RobotHandler : NetworkBehaviour
             }
 
             Vector3 moveDirection =
-                (doorTargetPosition.position - transform.GetChild(0).GetChild(1).GetChild(0).transform.position)
+                (doorTargetPosition.position - doorPosition)
                 .normalized;
             float distanceToTarget =
-                Vector3.Distance(transform.GetChild(0).GetChild(1).GetChild(0).transform.transform.position,
+                Vector3.Distance(doorPosition,
                     doorTargetPosition.position);
 
             if (distanceToTarget > 0.01f) // Ein kleiner Schwellenwert, um das "Angekommen"-Kriterium zu definieren
             {
-                transform.GetChild(0).GetChild(1).GetChild(0).transform.transform.position +=
-                    moveDirection * doorSpeed * Runner.DeltaTime;
+                transform.GetChild(0).GetChild(1).GetChild(0).transform.position = Vector3.MoveTowards(doorPosition,
+                    doorTargetPosition.position,
+                    doorSpeed * Runner.DeltaTime);
             }
-
-            /*transform.GetChild(0).GetChild(1).GetChild(0).transform.position =
-                doorTargetPosition.transform.position;*/
         }
     }
 
     // Diese Methode sammelt rekursiv alle Child-Objekte.
-    public void CollectAllMeasurementPoints(Transform parent)
+    private void CollectAllMeasurementPoints(Transform parent)
     {
         foreach (Transform child in parent)
         {
@@ -270,6 +276,94 @@ public class RobotHandler : NetworkBehaviour
             // Rufe die Methode rekursiv für das Child-Objekt auf, um seine Kinder zu sammeln.
             CollectAllMeasurementPoints(child);
         }
+    }
+
+    public void OpenCloseDoor()
+    {
+        if (!doorProcess)
+        {
+            doorProcess = true;
+        }
+    }
+
+    public void LegOffsetRotate(bool legFront, bool legLeft, bool inStep)
+    {
+        if (inStep)
+        {
+            if (legFront)
+            {
+                rotationOffset = rotationOffset + new Vector3(rotationOffsetValue, 0, 0);
+            }
+            else
+            {
+                rotationOffset = rotationOffset + new Vector3(-rotationOffsetValue, 0, 0);
+
+                //Rotate X -
+            }
+
+            if (legLeft)
+            {
+                rotationOffset = rotationOffset + new Vector3(0, 0, rotationOffsetValue);
+
+                //Rotate z +
+            }
+            else
+            {
+                rotationOffset = rotationOffset + new Vector3(0, 0, -rotationOffsetValue);
+
+                //Rotate z -
+            }
+        }
+        else
+        {
+            if (legFront)
+            {
+                rotationOffset = rotationOffset + new Vector3(-rotationOffsetValue, 0, 0);
+                //Rotate X -
+            }
+            else
+            {
+                rotationOffset = rotationOffset + new Vector3(rotationOffsetValue, 0, 0);
+
+                //Rotate X +
+            }
+
+            if (legLeft)
+            {
+                rotationOffset = rotationOffset + new Vector3(0, 0, -rotationOffsetValue);
+
+                //Rotate z -
+            }
+            else
+            {
+                rotationOffset = rotationOffset + new Vector3(0, 0, rotationOffsetValue);
+
+                //Rotate z +
+            }
+        }
+    }
+
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_EngineRequest(bool newEngineOn)
+    {
+        if (newEngineOn)
+        {
+            GetComponent<CharacterController>().center = new Vector3(0, 10, 0);
+        }
+        else
+        {
+            GetComponent<CharacterController>().center = new Vector3(0, 5, 0);
+        }
+
+        engineOn = newEngineOn;
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    public void RPC_DriverChangeRequest(PlayerRef newDriverPlayerRef, String newDriverPlayerName)
+    {
+        driverIsPlayerRef = newDriverPlayerRef;
+        driverIsPlayerName = newDriverPlayerName;
     }
 
     public void SetUpDriver(bool engineOn)

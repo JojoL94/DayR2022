@@ -64,6 +64,7 @@ public class InteractionHandler : NetworkBehaviour
             }
             else if (hitinfo.Hitbox.tag == "RobotDriver")
             {
+                GetComponent<CharacterController>().enabled = false;
                 localCameraHandler.SetNetworkCharacterPrototypeCustom(
                     hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
                     hitinfo.Hitbox.gameObject.transform);
@@ -75,6 +76,7 @@ public class InteractionHandler : NetworkBehaviour
             }
             else if (hitinfo.Hitbox.tag == "RobotGunner")
             {
+                GetComponent<CharacterController>().enabled = false;
                 localCameraHandler.SetNetworkCharacterPrototypeCustom(
                     hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
                     hitinfo.Hitbox.gameObject.transform);
@@ -82,6 +84,7 @@ public class InteractionHandler : NetworkBehaviour
             }
             else if (hitinfo.Hitbox.tag == "RobotExit")
             {
+                GetComponent<CharacterController>().enabled = true;
                 localCameraHandler.SetNetworkCharacterPrototypeCustom(
                     null, false,
                     null);

@@ -344,7 +344,7 @@ Transform:
   m_GameObject: {fileID: 3259546421507802497}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.75, y: -3.37, z: -0.89}
+  m_LocalPosition: {x: -1.75, y: -3.12, z: -0.89}
   m_LocalScale: {x: 7, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -447,7 +447,7 @@ Transform:
   m_GameObject: {fileID: 3375677203703599130}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.75, y: 8, z: -5.25}
+  m_LocalPosition: {x: 1.75, y: 8, z: -4.75}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -554,7 +554,7 @@ Transform:
   m_GameObject: {fileID: 5394435398175739121}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.75, y: -2.24, z: 0.3}
+  m_LocalPosition: {x: -1.75, y: -1.99, z: 0.3}
   m_LocalScale: {x: 3, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -856,7 +856,7 @@ CharacterController:
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
   m_MinMoveDistance: 0.001
-  m_Center: {x: 0, y: 4, z: 0}
+  m_Center: {x: 0, y: 5, z: 0}
 --- !u!114 &8676690074758872974
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -887,12 +887,13 @@ MonoBehaviour:
   TargetInterpolationDelay: 0.03
   gravity: -20
   jumpImpulse: 8
-  acceleration: 20
-  braking: 2
-  maxSpeed: 8
-  rotationSpeed: 40
+  acceleration: 10
+  braking: 3
+  maxSpeed: 20
+  rotationSpeed: 35
   viewUpDownRotationSpeed: 150
   _IsGrounded: 0
+  _LegsGrounded: 0
   _Velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &7857698369737885094
 MonoBehaviour:
@@ -1178,7 +1179,7 @@ Transform:
   m_GameObject: {fileID: 7883591374151191138}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.75, y: -2.833, z: -0.19999999}
+  m_LocalPosition: {x: -1.75, y: -2.583, z: -0.19999999}
   m_LocalScale: {x: 4, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1700,6 +1701,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 5122036879405405590}
     m_Modifications:
+    - target: {fileID: 2285269531205409094, guid: c0c946f6fb24c444b8ac8176abcb70f0,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 6.508828
+      objectReference: {fileID: 0}
+    - target: {fileID: 4593089293821273129, guid: c0c946f6fb24c444b8ac8176abcb70f0,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5112958372129614977, guid: c0c946f6fb24c444b8ac8176abcb70f0,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.5
+      objectReference: {fileID: 0}
     - target: {fileID: 6199531298785450186, guid: c0c946f6fb24c444b8ac8176abcb70f0,
         type: 3}
       propertyPath: m_LocalPosition.x
