@@ -60,12 +60,12 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
         if (runner.IsServer)
         {
             //Get the token for the player
-            int playerToken = GetPlayerToken(runner, player);
+            var playerToken = GetPlayerToken(runner, player);
 
             Debug.Log($"OnPlayerJoined we are server. Connection token {playerToken}");
 
             //Check if the token is already recorded by the server. 
-            if (mapTokenIDWithNetworkPlayer.TryGetValue(playerToken, out NetworkPlayer networkPlayer))
+            if (mapTokenIDWithNetworkPlayer.TryGetValue(playerToken, out var networkPlayer))
             {
                 Debug.Log($"Found old connection token for token {playerToken}. Assigning controlls to that player");
 
@@ -76,9 +76,9 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
             {
                 Debug.Log($"Spawning new player for connection token {playerToken}");
 
-                bool isReadyScene = SceneManager.GetActiveScene().name == "Ready";
+                var isReadyScene = SceneManager.GetActiveScene().name == "Ready";
 
-                Vector3 spawnPosition = Utils.GetRandomSpawnPoint();
+                var spawnPosition = Utils.GetRandomSpawnPoint();
                 if (isReadyScene)
                 {
                     //Check if we are the host
@@ -92,7 +92,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
                     }
                 }
 
-                NetworkPlayer spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
+                var spawnedNetworkPlayer = runner.Spawn(playerPrefab, spawnPosition, Quaternion.identity, player);
                 spawnedNetworkPlayer.transform.position = spawnPosition;
                 
                 //Store the token for the player
@@ -138,7 +138,7 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
         {
             sessionListUIHandler.ClearList();
 
-            foreach (SessionInfo sessionInfo in sessionList)
+            foreach (var sessionInfo in sessionList)
             {
                 sessionListUIHandler.AddToList(sessionInfo);
 
@@ -167,9 +167,9 @@ public class Spawner : MonoBehaviour, INetworkRunnerCallbacks
     {
         Debug.Log("Spawner OnHostMigrationCleanUp started");
 
-        foreach (KeyValuePair<int, NetworkPlayer> entry in mapTokenIDWithNetworkPlayer)
+        foreach (var entry in mapTokenIDWithNetworkPlayer)
         {
-            NetworkObject networkObjectInDictionary = entry.Value.GetComponent<NetworkObject>();
+            var networkObjectInDictionary = entry.Value.GetComponent<NetworkObject>();
 
             if (networkObjectInDictionary.InputAuthority.IsNone)
             {

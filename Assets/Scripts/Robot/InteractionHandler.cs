@@ -48,7 +48,7 @@ public class InteractionHandler : NetworkBehaviour
         Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, hitDistance, Object.InputAuthority,
             out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority);
 
-        bool isInteractableObject = false;
+        var isInteractableObject = false;
 
         if (hitinfo.Distance > 0)
             hitDistance = hitinfo.Distance;
@@ -64,36 +64,44 @@ public class InteractionHandler : NetworkBehaviour
             }
             else if (hitinfo.Hitbox.tag == "RobotDriver")
             {
+
                 GetComponent<CharacterController>().enabled = false;
                 localCameraHandler.SetNetworkCharacterPrototypeCustom(
                     hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
-                    hitinfo.Hitbox.gameObject.transform);
+                    hitinfo.Hitbox.gameObject.transform.GetChild(0));
+                
                 GetComponent<CharacterMovementHandler>().SetCharacterMode(
                     hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(),
-                    hitinfo.Hitbox.gameObject.transform);
+                    hitinfo.Hitbox.gameObject.transform.GetChild(0), null);
+               
                 hitinfo.Hitbox.Root.GetComponent<RobotHandler>()
                     .SetUpDriver(true);
             }
             else if (hitinfo.Hitbox.tag == "RobotGunner")
             {
                 GetComponent<CharacterController>().enabled = false;
+               
                 localCameraHandler.SetNetworkCharacterPrototypeCustom(
                     hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
-                    hitinfo.Hitbox.gameObject.transform);
-                GetComponent<CharacterMovementHandler>().SetCharacterMode(null, hitinfo.Hitbox.gameObject.transform);
+                    hitinfo.Hitbox.gameObject.transform.GetChild(0));
+                
+                GetComponent<CharacterMovementHandler>().SetCharacterMode(null, hitinfo.Hitbox.gameObject.transform.GetChild(0), null);
             }
             else if (hitinfo.Hitbox.tag == "RobotExit")
             {
                 GetComponent<CharacterController>().enabled = true;
+                
                 localCameraHandler.SetNetworkCharacterPrototypeCustom(
                     null, false,
                     null);
                 GetComponent<CharacterMovementHandler>().SetCharacterMode(
                     null,
-                    null);
+                    null, hitinfo.Hitbox.gameObject.transform);
+                
                 hitinfo.Hitbox.Root.GetComponent<RobotHandler>()
                     .SetUpDriver(false);
-                transform.position = hitinfo.Hitbox.gameObject.transform.position;
+                
+                //Position ändern
             }
 
             if (Object.HasStateAuthority)
@@ -130,12 +138,12 @@ public class InteractionHandler : NetworkBehaviour
     {
         //Debug.Log($"{Time.time} OnFireChanged value {changed.Behaviour.isFiring}");
 
-        bool isInteractingCurrent = changed.Behaviour.isInteracting;
+        var isInteractingCurrent = changed.Behaviour.isInteracting;
 
         //Load the old value
         changed.LoadOld();
 
-        bool isInteractingOld = changed.Behaviour.isInteracting;
+        var isInteractingOld = changed.Behaviour.isInteracting;
 
         if (isInteractingCurrent && !isInteractingOld)
             changed.Behaviour.OnInteractRemote();

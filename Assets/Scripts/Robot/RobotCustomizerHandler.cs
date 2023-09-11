@@ -57,7 +57,7 @@ public class RobotCustomizerHandler : NetworkBehaviour
         if (SceneManager.GetActiveScene().name != "Ready")
             return;
 
-        NetworkRobotParts newRobotParts = networkRobotParts;
+        var newRobotParts = networkRobotParts;
         newRobotParts.kanonePrefabID = (byte)Random.Range(0, kanonePrefabs.Count);
         newRobotParts.huellePrefabID = (byte)Random.Range(0, huellePrefabs.Count);
         newRobotParts.interiorPrefabID = (byte)Random.Range(0, interiorPrefabs.Count);
@@ -70,7 +70,7 @@ public class RobotCustomizerHandler : NetworkBehaviour
 
     GameObject ReplaceRobotPart(GameObject currentRobotPart, GameObject prefabNewRobotPart)
     {
-        GameObject newPart = Instantiate(prefabNewRobotPart, currentRobotPart.transform.position,
+        var newPart = Instantiate(prefabNewRobotPart, currentRobotPart.transform.position,
             currentRobotPart.transform.rotation);
         newPart.transform.parent = currentRobotPart.transform.parent;
         Utils.SetRenderLayerInChildren(newPart.transform, currentRobotPart.layer);
@@ -121,7 +121,7 @@ public class RobotCustomizerHandler : NetworkBehaviour
 
     public void OnCycleKanone()
     {
-        NetworkRobotParts newRobotPart = networkRobotParts;
+        var newRobotPart = networkRobotParts;
 
         //Pick next head
         newRobotPart.kanonePrefabID++;
@@ -136,7 +136,7 @@ public class RobotCustomizerHandler : NetworkBehaviour
 
     public void OnCycleHuelle()
     {
-        NetworkRobotParts newRobotPart = networkRobotParts;
+        var newRobotPart = networkRobotParts;
 
         //Pick next head
         newRobotPart.huellePrefabID++;
@@ -151,7 +151,7 @@ public class RobotCustomizerHandler : NetworkBehaviour
 
     public void OnCycleInterior()
     {
-        NetworkRobotParts newRobotPart = networkRobotParts;
+        var newRobotPart = networkRobotParts;
 
         //Pick next head
         newRobotPart.interiorPrefabID++;
@@ -166,7 +166,7 @@ public class RobotCustomizerHandler : NetworkBehaviour
 
     public void OnCycleLeg()
     {
-        NetworkRobotParts newRobotPart = networkRobotParts;
+        var newRobotPart = networkRobotParts;
 
         //Pick next head
         newRobotPart.legPrefabID++;

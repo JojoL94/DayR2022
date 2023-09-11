@@ -20,8 +20,8 @@ public class FloatSmoother
             values.Dequeue();
         }
 
-        float sum = 0f;
-        foreach (float v in values)
+        var sum = 0f;
+        foreach (var v in values)
         {
             sum += v;
         }

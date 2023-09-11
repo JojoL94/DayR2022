@@ -53,6 +53,7 @@ public class LegTargetHandler : NetworkBehaviour
         defaultMoveSpeed = networkCharacterControllerPrototypeCustom.maxSpeed;
 
     }
+    
 
     void Update()
     {
@@ -88,11 +89,11 @@ public class LegTargetHandler : NetworkBehaviour
             targetHit = Vector3.MoveTowards(targetHit, hit.point, 20f * Time.deltaTime);
             // Der Raycast hat den Boden getroffen
             Debug.DrawRay(transform.position, raycastDirection * raycastDistance, Color.green);
-            float distancePointTarget = Vector3.Distance(targetHit, target.position);
+            var distancePointTarget = Vector3.Distance(targetHit, target.position);
             
-            bool inStepDistance = !(distancePointTarget > stepDistance);
-            bool makeStepBlocked = blockedByNeighborBF && blockedByNeighborLR;
-            bool ignoreBlocked = distancePointTarget > stepDistance*1.5f;
+            var inStepDistance = !(distancePointTarget > stepDistance);
+            var makeStepBlocked = blockedByNeighborBF && blockedByNeighborLR;
+            var ignoreBlocked = distancePointTarget > stepDistance*1.5f;
 
             if (makeStep && blockedByNeighborLR && blockedByNeighborBF)
             {

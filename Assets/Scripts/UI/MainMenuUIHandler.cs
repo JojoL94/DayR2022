@@ -40,7 +40,7 @@ public class MainMenuUIHandler : MonoBehaviour
 
         GameManager.instance.playerNickName = playerNameInputField.text;
 
-        NetworkRunnerHandler networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
+        var networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
 
         networkRunnerHandler.OnJoinLobby();
 
@@ -59,7 +59,7 @@ public class MainMenuUIHandler : MonoBehaviour
 
     public void OnStartNewSessionClicked()
     {
-        NetworkRunnerHandler networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
+        var networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
 
         networkRunnerHandler.CreateGame(sessionNameInputField.text, "Ready");
 

@@ -45,11 +45,11 @@ public class GrenadeHandler : NetworkBehaviour
         {
             if (explodeTickTimer.Expired(Runner))
             {
-                int hitCount = Runner.LagCompensation.OverlapSphere(transform.position, 4, thrownByPlayerRef, hits, collisionLayers);
+                var hitCount = Runner.LagCompensation.OverlapSphere(transform.position, 4, thrownByPlayerRef, hits, collisionLayers);
 
-                for (int i = 0; i < hitCount; i++)
+                for (var i = 0; i < hitCount; i++)
                 {
-                    HPHandler hpHandler = hits[i].Hitbox.transform.root.GetComponent<HPHandler>();
+                    var hpHandler = hits[i].Hitbox.transform.root.GetComponent<HPHandler>();
 
                     if (hpHandler != null)
                         hpHandler.OnTakeDamage(thrownByPlayerName, 100);
@@ -66,7 +66,7 @@ public class GrenadeHandler : NetworkBehaviour
     //When despawning the object we want to create a visual explosion
     public override void Despawned(NetworkRunner runner, bool hasState)
     {
-        MeshRenderer grenadeMesh = GetComponentInChildren<MeshRenderer>();
+        var grenadeMesh = GetComponentInChildren<MeshRenderer>();
 
         Instantiate(explosionParticleSystemPrefab, grenadeMesh.transform.position, Quaternion.identity);
     }

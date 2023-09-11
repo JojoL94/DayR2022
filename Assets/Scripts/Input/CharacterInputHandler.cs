@@ -118,7 +118,7 @@ public class CharacterInputHandler : MonoBehaviour
 
     public NetworkInputData GetNetworkInput()
     {
-        NetworkInputData networkInputData = new NetworkInputData();
+        var networkInputData = new NetworkInputData();
 
         //Aim data
         networkInputData.aimForwardVector = localCameraHandler.transform.forward;

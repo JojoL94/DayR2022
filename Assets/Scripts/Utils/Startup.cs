@@ -9,9 +9,9 @@ public class Startup
     {
         Debug.Log("-- Instantiating objects --");
 
-        GameObject[] prefabsToInstantiate = Resources.LoadAll<GameObject>("InstantiateOnLoad/");
+        var prefabsToInstantiate = Resources.LoadAll<GameObject>("InstantiateOnLoad/");
 
-        foreach (GameObject prefab in prefabsToInstantiate)
+        foreach (var prefab in prefabsToInstantiate)
         {
             Debug.Log($"Creating {prefab.name}");
 

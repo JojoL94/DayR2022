@@ -66,31 +66,29 @@ public class RobotHandler : NetworkBehaviour
     //Network update
     public override void FixedUpdateNetwork()
     {
+
         DoorProcess();
-
         float hitDistance = 50;
-        Vector3 averageNormal = Vector3.zero;
-        Vector3 averagePosition = Vector3.zero;
+        var averageNormal = Vector3.zero;
+        if (Object.HasStateAuthority)
+        {
+            var averagePosition = Vector3.zero;
 
-        foreach (Transform point in measurementPoints)
+        foreach (var point in measurementPoints)
         {
             RaycastHit hit;
-            if (Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer))
-            {
-                averageNormal += hit.normal;
-                averagePosition += hit.point;
-            }
+            if (!Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer)) continue;
+            averageNormal += hit.normal;
+            averagePosition += hit.point;
         }
 
         averagePosition /= measurementPoints.Count;
-        Vector2 currentPosition = new Vector2(transform.position.x, transform.position.z);
+        var currentPosition = new Vector2(transform.position.x, transform.position.z);
         if (currentPosition != oldPositon)
         {
             RotateRobotMotion(averageNormal);
             oldPositon = transform.position;
         }
-
-
         if (!engineOn)
         {
             GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
@@ -105,8 +103,7 @@ public class RobotHandler : NetworkBehaviour
             HeightRobotMotion(averagePosition.y + robotYOffset, heightValue - robotYOffset);
         }
 
-        if (Object.HasStateAuthority)
-        {
+      
         }
     }
 
@@ -127,11 +124,11 @@ public class RobotHandler : NetworkBehaviour
                 {
                     isRobotFalling = false;
 
-                    float newYPosition = hit.point.y + targetHeightAboveGround;
+                    var newYPosition = hit.point.y + targetHeightAboveGround;
 
                     // Bewege das Objekt zur vorgegebenen Höhe über dem Boden (nur Y-Komponente ändern)
-                    Vector3 newPosition = new Vector3(transform.position.x, newYPosition, transform.position.z);
-                    Vector3 smoothedNewPosition = smootherHeight.Smooth(newPosition);
+                    var newPosition = new Vector3(transform.position.x, newYPosition, transform.position.z);
+                    var smoothedNewPosition = smootherHeight.Smooth(newPosition);
                     transform.position = Vector3.MoveTowards(transform.position, smoothedNewPosition,
                         Runner.DeltaTime * moveSpeed);
                 }
@@ -166,8 +163,8 @@ public class RobotHandler : NetworkBehaviour
         {
             averageNormal /= measurementPoints.Count;
             averageNormal.Normalize();
-            Vector3 smoothedAverageNormal = smootherNormal.Smooth(averageNormal);
-            Quaternion targetRotation =
+            var smoothedAverageNormal = smootherNormal.Smooth(averageNormal);
+            var targetRotation =
                 Quaternion.FromToRotation(transform.up, smoothedAverageNormal) * transform.rotation;
             // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
             if (Quaternion.Angle(transform.rotation, targetRotation) > rotationThreshold)
@@ -180,7 +177,7 @@ public class RobotHandler : NetworkBehaviour
 
         if (engineOn)
         {
-            Quaternion targetRotationOffset =
+            var targetRotationOffset =
                 Quaternion.FromToRotation(transform.up, rotationOffset) * transform.rotation;
             // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
             if (Quaternion.Angle(transform.rotation, targetRotationOffset) > rotationThreshold)
@@ -194,10 +191,10 @@ public class RobotHandler : NetworkBehaviour
 
     private void DoorProcess()
     {
-        Vector3 doorPosition = transform.GetChild(0).GetChild(1).GetChild(0).transform.position;
-        float distClosedMarker = Vector3.Distance(doorPosition,
+        var doorPosition = transform.GetChild(0).GetChild(1).GetChild(0).transform.position;
+        var distClosedMarker = Vector3.Distance(doorPosition,
             closedMarker.transform.position);
-        float distOpenMarker = Vector3.Distance(doorPosition,
+        var distOpenMarker = Vector3.Distance(doorPosition,
             openedMarker.transform.position);
 
         if (doorProcess)
@@ -211,10 +208,7 @@ public class RobotHandler : NetworkBehaviour
                 doorTargetPosition = openedMarker;
             }
 
-            Vector3 moveDirection =
-                (doorTargetPosition.position - doorPosition)
-                .normalized;
-            float distanceToTarget =
+            var distanceToTarget =
                 Vector3.Distance(doorPosition,
                     doorTargetPosition.position);
 
@@ -249,10 +243,7 @@ public class RobotHandler : NetworkBehaviour
                 doorTargetPosition = closedMarker;
             }
 
-            Vector3 moveDirection =
-                (doorTargetPosition.position - doorPosition)
-                .normalized;
-            float distanceToTarget =
+            var distanceToTarget =
                 Vector3.Distance(doorPosition,
                     doorTargetPosition.position);
 

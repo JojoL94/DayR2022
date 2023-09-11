@@ -72,7 +72,7 @@ public class WeaponHandler : NetworkBehaviour
        Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, 100, Object.InputAuthority, out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority); 
 
         float hitDistance = 100;
-        bool isHitOtherPlayer = false;
+        var isHitOtherPlayer = false;
 
         if (hitinfo.Distance > 0)
             hitDistance = hitinfo.Distance;
@@ -149,12 +149,12 @@ public class WeaponHandler : NetworkBehaviour
     {
         //Debug.Log($"{Time.time} OnFireChanged value {changed.Behaviour.isFiring}");
 
-        bool isFiringCurrent = changed.Behaviour.isFiring;
+        var isFiringCurrent = changed.Behaviour.isFiring;
 
         //Load the old value
         changed.LoadOld();
 
-        bool isFiringOld = changed.Behaviour.isFiring;
+        var isFiringOld = changed.Behaviour.isFiring;
 
         if (isFiringCurrent && !isFiringOld)
             changed.Behaviour.OnFireRemote();

@@ -40,10 +40,10 @@ public class RobotInteractableHandler : NetworkBehaviour
         if (doorOpenProcess)
         {
             // Distance moved equals elapsed time times speed..
-            float distCovered = (Time.time - startTime) * speed;
+            var distCovered = (Time.time - startTime) * speed;
 
             // Fraction of journey completed equals current distance divided by total distance.
-            float fractionOfJourney = distCovered / journeyLength;
+            var fractionOfJourney = distCovered / journeyLength;
 
             // Set our position as a fraction of the distance between the markers.
             door.transform.position = Vector3.Lerp(closedMarker.position, openMarker.position, fractionOfJourney);
@@ -60,10 +60,10 @@ public class RobotInteractableHandler : NetworkBehaviour
         if (doorCloseProcess)
         {
             // Distance moved equals elapsed time times speed..
-            float distCovered = (Time.time - startTime) * speed;
+            var distCovered = (Time.time - startTime) * speed;
 
             // Fraction of journey completed equals current distance divided by total distance.
-            float fractionOfJourney = distCovered / journeyLength;
+            var fractionOfJourney = distCovered / journeyLength;
 
             // Set our position as a fraction of the distance between the markers.
             door.transform.position = Vector3.Lerp(openMarker.position, closedMarker.position, fractionOfJourney);

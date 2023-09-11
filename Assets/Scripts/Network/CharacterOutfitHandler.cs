@@ -67,7 +67,7 @@ public class CharacterOutfitHandler : NetworkBehaviour
         if (SceneManager.GetActiveScene().name != "Ready")
             return;
 
-        NetworkOutfit newOutfit = networkOutfit;
+        var newOutfit = networkOutfit;
 
         //Pick a random outfit
         newOutfit.headPrefabID = (byte)Random.Range(0, headPrefabs.Count);
@@ -85,7 +85,7 @@ public class CharacterOutfitHandler : NetworkBehaviour
 
     GameObject ReplaceBodyPart(GameObject currentBodyPart, GameObject prefabNewBodyPart)
     {
-        GameObject newPart = Instantiate(prefabNewBodyPart, currentBodyPart.transform.position, currentBodyPart.transform.rotation);
+        var newPart = Instantiate(prefabNewBodyPart, currentBodyPart.transform.position, currentBodyPart.transform.rotation);
         newPart.transform.parent = currentBodyPart.transform.parent;
         Utils.SetRenderLayerInChildren(newPart.transform, currentBodyPart.layer);
         Destroy(currentBodyPart);
@@ -133,7 +133,7 @@ public class CharacterOutfitHandler : NetworkBehaviour
 
     public void OnCycleHead()
     {
-        NetworkOutfit newOutfit = networkOutfit;
+        var newOutfit = networkOutfit;
 
         //Pick next head
         newOutfit.headPrefabID++;
@@ -148,7 +148,7 @@ public class CharacterOutfitHandler : NetworkBehaviour
 
     public void OnCycleBody()
     {
-        NetworkOutfit newOutfit = networkOutfit;
+        var newOutfit = networkOutfit;
 
         //Pick next head
         newOutfit.bodyPrefabID++;
@@ -163,7 +163,7 @@ public class CharacterOutfitHandler : NetworkBehaviour
 
     public void OnCycleLeftArm()
     {
-        NetworkOutfit newOutfit = networkOutfit;
+        var newOutfit = networkOutfit;
 
         //Pick next head
         newOutfit.leftArmPrefabID++;
@@ -178,7 +178,7 @@ public class CharacterOutfitHandler : NetworkBehaviour
 
     public void OnCycleRightArm()
     {
-        NetworkOutfit newOutfit = networkOutfit;
+        var newOutfit = networkOutfit;
 
         //Pick next head
         newOutfit.rightArmPrefabID++;

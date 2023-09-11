@@ -13,10 +13,10 @@ public class ReadyUIHandler : NetworkBehaviour
     public TextMeshProUGUI countDownText;
     public NetworkObject robotPrefab;
     public NetworkObject robot;
-    public Button robotCustomizButton0;
-    public Button robotCustomizButton1;
-    public Button robotCustomizButton2;
-    public Button robotCustomizButton3;
+    public Button robotCustomizeButton0;
+    public Button robotCustomizeButton1;
+    public Button robotCustomizeButton2;
+    public Button robotCustomizeButton3;
 
     bool isReady = false;
 
@@ -34,10 +34,10 @@ public class ReadyUIHandler : NetworkBehaviour
     void Start()
     {
         countDownText.text = "";
-        robotCustomizButton0.enabled = false;
-        robotCustomizButton1.enabled = false;
-        robotCustomizButton2.enabled = false;
-        robotCustomizButton3.enabled = false;
+        robotCustomizeButton0.enabled = false;
+        robotCustomizeButton1.enabled = false;
+        robotCustomizeButton2.enabled = false;
+        robotCustomizeButton3.enabled = false;
         if (robotAllreadySpawned)
         {
             robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
@@ -46,7 +46,7 @@ public class ReadyUIHandler : NetworkBehaviour
 
     void Update()
     {
-        float lerpSpeed = 0.5f;
+        var lerpSpeed = 0.5f;
 
         if (!isReady)
         {
@@ -79,11 +79,11 @@ public class ReadyUIHandler : NetworkBehaviour
         //Lock the session, so no other client can join
         Runner.SessionInfo.IsOpen = false;
 
-        GameObject[] gameObjectsToTransfer = GameObject.FindGameObjectsWithTag("Player");
-        GameObject robot = GameObject.FindGameObjectWithTag("Robot");
+        var gameObjectsToTransfer = GameObject.FindGameObjectsWithTag("Player");
+        var robot = GameObject.FindGameObjectWithTag("Robot");
         DontDestroyOnLoad(robot);
 
-        foreach (GameObject gameObjectToTransfer in gameObjectsToTransfer)
+        foreach (var gameObjectToTransfer in gameObjectsToTransfer)
         {
             DontDestroyOnLoad(gameObjectToTransfer);
             //Check if the player is ready
@@ -141,15 +141,15 @@ public class ReadyUIHandler : NetworkBehaviour
                 Quaternion.identity, null,
                 (runner, spawnedRobot) =>
                 {
-                    /*Hier kann ein Script vor dem Spawn ausgeführt werden.*/
+ 
                 });
-
+            
             if (robot != null)
             {
-                robotCustomizButton0.enabled = true;
-                robotCustomizButton1.enabled = true;
-                robotCustomizButton2.enabled = true;
-                robotCustomizButton3.enabled = true;
+                robotCustomizeButton0.enabled = true;
+                robotCustomizeButton1.enabled = true;
+                robotCustomizeButton2.enabled = true;
+                robotCustomizeButton3.enabled = true;
                 buttonRobotSpawnText.text = "--";
                 robotAllreadySpawned = true;
             }
@@ -157,10 +157,10 @@ public class ReadyUIHandler : NetworkBehaviour
         else
         {
             robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
-            robotCustomizButton0.enabled = true;
-            robotCustomizButton1.enabled = true;
-            robotCustomizButton2.enabled = true;
-            robotCustomizButton3.enabled = true;
+            robotCustomizeButton0.enabled = true;
+            robotCustomizeButton1.enabled = true;
+            robotCustomizeButton2.enabled = true;
+            robotCustomizeButton3.enabled = true;
             buttonRobotSpawnText.text = "--";
         }
     }

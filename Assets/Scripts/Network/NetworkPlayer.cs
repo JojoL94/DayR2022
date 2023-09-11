@@ -33,7 +33,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     
     public override void Spawned()
     {
-        bool isReadyScene = SceneManager.GetActiveScene().name == "Ready";
+        var isReadyScene = SceneManager.GetActiveScene().name == "Ready";
 
         if (Object.HasInputAuthority)
         {
@@ -103,7 +103,7 @@ public class NetworkPlayer : NetworkBehaviour, IPlayerLeft
     {
         if (Object.HasStateAuthority)
         {
-            if (Runner.TryGetPlayerObject(player, out NetworkObject playerLeftNetworkObject))
+            if (Runner.TryGetPlayerObject(player, out var playerLeftNetworkObject))
             {
                 if (playerLeftNetworkObject == Object)
                     Local.GetComponent<NetworkInGameMessages>().SendInGameRPCMessage(playerLeftNetworkObject.GetComponent<NetworkPlayer>().nickName.ToString(), "left");

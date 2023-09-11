@@ -55,16 +55,16 @@ public class RocketHandler : NetworkBehaviour
             }
 
             //Check if the rocket has hit anything
-            int hitCount = Runner.LagCompensation.OverlapSphere(checkForImpactPoint.position, 0.5f, firedByPlayerRef, hits, collisionLayers, HitOptions.IncludePhysX);
+            var hitCount = Runner.LagCompensation.OverlapSphere(checkForImpactPoint.position, 0.5f, firedByPlayerRef, hits, collisionLayers, HitOptions.IncludePhysX);
 
-            bool isValidHit = false;
+            var isValidHit = false;
 
             //We've hit something, so the hit could be valid
             if (hitCount > 0)
                 isValidHit = true;
 
             //check what we've hit
-            for (int i = 0; i < hitCount; i++)
+            for (var i = 0; i < hitCount; i++)
             {
                 //Check if we have hit a Hitbox
                 if (hits[i].Hitbox != null)
@@ -82,9 +82,9 @@ public class RocketHandler : NetworkBehaviour
                 hitCount = Runner.LagCompensation.OverlapSphere(checkForImpactPoint.position, 4, firedByPlayerRef, hits, collisionLayers, HitOptions.None);
 
                 //Deal damage to anything within the hit radius
-                for (int i = 0; i < hitCount; i++)
+                for (var i = 0; i < hitCount; i++)
                 {
-                    HPHandler hpHandler = hits[i].Hitbox.transform.root.GetComponent<HPHandler>();
+                    var hpHandler = hits[i].Hitbox.transform.root.GetComponent<HPHandler>();
 
                     if (hpHandler != null)
                         hpHandler.OnTakeDamage(firedByPlayerName, 100);

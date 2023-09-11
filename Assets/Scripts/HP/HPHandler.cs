@@ -59,19 +59,19 @@ public class HPHandler : NetworkBehaviour
         //Clear old
         flashMeshRenderers.Clear();
 
-        MeshRenderer[] meshRenderers = playerModel.GetComponentsInChildren<MeshRenderer>();
-        foreach (MeshRenderer meshRenderer in meshRenderers)
+        var meshRenderers = playerModel.GetComponentsInChildren<MeshRenderer>();
+        foreach (var meshRenderer in meshRenderers)
             flashMeshRenderers.Add(new FlashMeshRenderer(meshRenderer, null));
 
 
-        SkinnedMeshRenderer[] skinnedMeshRenderers = playerModel.GetComponentsInChildren<SkinnedMeshRenderer>();
-        foreach (SkinnedMeshRenderer skinnedMeshRenderer in skinnedMeshRenderers)
+        var skinnedMeshRenderers = playerModel.GetComponentsInChildren<SkinnedMeshRenderer>();
+        foreach (var skinnedMeshRenderer in skinnedMeshRenderers)
             flashMeshRenderers.Add(new FlashMeshRenderer(null, skinnedMeshRenderer));
     }
 
     IEnumerator OnHitCO()
     {
-        foreach (FlashMeshRenderer flashMeshRenderer in flashMeshRenderers)
+        foreach (var flashMeshRenderer in flashMeshRenderers)
             flashMeshRenderer.ChangeColor(Color.red);
 
         if (Object.HasInputAuthority)
@@ -79,7 +79,7 @@ public class HPHandler : NetworkBehaviour
 
         yield return new WaitForSeconds(0.2f);
 
-        foreach (FlashMeshRenderer flashMeshRenderer in flashMeshRenderers)
+        foreach (var flashMeshRenderer in flashMeshRenderers)
             flashMeshRenderer.RestoreColor();
 
         if (Object.HasInputAuthority && !isDead)
@@ -126,12 +126,12 @@ public class HPHandler : NetworkBehaviour
     {
         Debug.Log($"{Time.time} OnHPChanged value {changed.Behaviour.HP}");
 
-        byte newHP = changed.Behaviour.HP;
+        var newHP = changed.Behaviour.HP;
 
         //Load the old value
         changed.LoadOld();
 
-        byte oldHP = changed.Behaviour.HP;
+        var oldHP = changed.Behaviour.HP;
 
         //Check if the HP has been decreased
         if (newHP < oldHP)
@@ -150,12 +150,12 @@ public class HPHandler : NetworkBehaviour
     {
         Debug.Log($"{Time.time} OnStateChanged isDead {changed.Behaviour.isDead}");
 
-        bool isDeadCurrent = changed.Behaviour.isDead;
+        var isDeadCurrent = changed.Behaviour.isDead;
 
         //Load the old value
         changed.LoadOld();
 
-        bool isDeadOld = changed.Behaviour.isDead;
+        var isDeadOld = changed.Behaviour.isDead;
 
         //Handle on death for the player. Also check if the player was dead but is now alive in that case revive the player.
         if (isDeadCurrent)

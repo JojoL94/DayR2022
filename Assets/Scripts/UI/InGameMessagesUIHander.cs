@@ -24,7 +24,7 @@ public class InGameMessagesUIHander : MonoBehaviour
         if (messageQueue.Count > 3)
             messageQueue.Dequeue();
 
-        int queueIndex = 0;
+        var queueIndex = 0;
         foreach (string messageInQueue in messageQueue)
         {
             textMeshProUGUIs[queueIndex].text = messageInQueue;

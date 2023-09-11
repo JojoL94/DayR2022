@@ -15,13 +15,13 @@ public class FlashMeshRenderer
 
         if (meshRenderer != null)
         {
-            foreach (Material material in meshRenderer.materials)
+            foreach (var material in meshRenderer.materials)
                 defaultColors.Add(material.color);
         }
 
         if (skinnedMeshRenderer != null)
         {
-            foreach (Material material in skinnedMeshRenderer.materials)
+            foreach (var material in skinnedMeshRenderer.materials)
                 defaultColors.Add(material.color);
         }
 
@@ -31,13 +31,13 @@ public class FlashMeshRenderer
     {
         if (meshRenderer != null)
         {
-            for (int i = 0; i < meshRenderer.materials.Length; i++)
+            for (var i = 0; i < meshRenderer.materials.Length; i++)
                 meshRenderer.materials[i].color = flashColor;
         }
 
         if (skinnedMeshRenderer != null)
         {
-            for (int i = 0; i < skinnedMeshRenderer.materials.Length; i++)
+            for (var i = 0; i < skinnedMeshRenderer.materials.Length; i++)
                 skinnedMeshRenderer.materials[i].color = flashColor;
         }
     }
@@ -46,13 +46,13 @@ public class FlashMeshRenderer
     {
         if (meshRenderer != null)
         {
-            for (int i = 0; i < meshRenderer.materials.Length; i++)
+            for (var i = 0; i < meshRenderer.materials.Length; i++)
                 meshRenderer.materials[i].color = defaultColors[i];
         }
 
         if (skinnedMeshRenderer != null)
         {
-            for (int i = 0; i < skinnedMeshRenderer.materials.Length; i++)
+            for (var i = 0; i < skinnedMeshRenderer.materials.Length; i++)
                 skinnedMeshRenderer.materials[i].color = defaultColors[i];
         }
     }

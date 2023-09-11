@@ -21,8 +21,8 @@ public class Vector3Smoother
             values.Dequeue();
         }
 
-        Vector3 sum = Vector3.zero;
-        foreach (Vector3 v in values)
+        var sum = Vector3.zero;
+        foreach (var v in values)
         {
             sum += v;
         }

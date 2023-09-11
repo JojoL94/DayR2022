@@ -65,14 +65,14 @@ public class LocalCameraHandler : MonoBehaviour
         cameraRotationX = Mathf.Clamp(cameraRotationX, -90, 90);
         if (inDrivingMode)
         {
-            Quaternion targetRotation = driverSeat.root.rotation;
-            Quaternion currentRotation = transform.rotation;
+            var targetRotation = driverSeat.root.rotation;
+            var currentRotation = transform.rotation;
 
             // Berechne die Differenz zwischen den Rotationen
-            Quaternion rotationDifference = Quaternion.Inverse(currentRotation) * targetRotation;
+            var rotationDifference = Quaternion.Inverse(currentRotation) * targetRotation;
 
             // Berechne den Winkel der Differenz
-            float angleDifference = Quaternion.Angle(Quaternion.identity, rotationDifference);
+            var angleDifference = Quaternion.Angle(Quaternion.identity, rotationDifference);
 
             // Erhöhe die Rotationsgeschwindigkeit basierend auf der Differenz
             currentRotationSpeed =
@@ -82,10 +82,10 @@ public class LocalCameraHandler : MonoBehaviour
             // Maus-Input für die zusätzliche Rotation
             cameraRotationY += viewInput.x * Time.deltaTime *
                                localNetworkCharacterControllerPrototypeCustom.rotationSpeed;
-            Quaternion mouseRotation = Quaternion.Euler(cameraRotationX, cameraRotationY, 0f);
+            var mouseRotation = Quaternion.Euler(cameraRotationX, cameraRotationY, 0f);
 
             // Kombiniere die Rotationen (Zielrotation, Mausrotation)
-            Quaternion newRotation = targetRotation * mouseRotation;
+            var newRotation = targetRotation * mouseRotation;
 
             // Drehe das Objekt
             transform.rotation =

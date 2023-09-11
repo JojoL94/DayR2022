@@ -9,7 +9,8 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     bool isRespawnRequested = false;
 
-
+    private bool exitSeat;
+    private Transform exitPoint;
     private bool inDrivingMode;
     private bool inGunnerMode;
     private Transform robotSeat;
@@ -61,7 +62,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             transform.forward = networkInputData.aimForwardVector;
 
             //Cancel out rotation on X axis as we don't want our character to tilt
-            Quaternion rotation = transform.rotation;
+            var rotation = transform.rotation;
             rotation.eulerAngles = new Vector3(0, rotation.eulerAngles.y, rotation.eulerAngles.z);
             transform.rotation = rotation;
             if (inDrivingMode)
@@ -71,10 +72,10 @@ public class CharacterMovementHandler : NetworkBehaviour
             else if (inGunnerMode)
             {
                 // Berechne die gewünschte Position basierend auf dem Zielobjekt und dem Offset
-                Vector3 desiredPosition = robotSeat.position;
+                var desiredPosition = robotSeat.position;
 
                 // Verwende Lerp, um die Position allmählich an die gewünschte Position anzunähern
-                Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSeatSpeed);
+                var smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSeatSpeed);
 
                 // Aktualisiere die Position des Objekts
                 transform.position = smoothedPosition;
@@ -92,36 +93,48 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     private void MoveCharacter(NetworkInputData networkInputData)
     {
-        //Move
-        Vector3 moveDirection = transform.forward * networkInputData.movementInput.y +
-                                transform.right * networkInputData.movementInput.x;
-        moveDirection.Normalize();
-
-        networkCharacterControllerPrototypeCustom.Move(moveDirection, false);
-
-        //Jump
-        if (networkInputData.isJumpPressed)
-            networkCharacterControllerPrototypeCustom.Jump();
-
-        Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
-            networkCharacterControllerPrototypeCustom.Velocity.z);
-        walkVector.Normalize();
-
-        walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
-
-        if (characterAnimator != null)
+        if (exitSeat)
         {
-            characterAnimator.SetFloat("walkSpeed", walkSpeed);
+            transform.position = Vector3.MoveTowards(transform.position, exitPoint.position, Runner.DeltaTime * 3f);
+            if (Vector3.Distance(transform.position, exitPoint.position) < 0.2f)
+            {
+                exitSeat = false;
+            }
         }
+        else
+        {
+            //Move
+            var moveDirection = transform.forward * networkInputData.movementInput.y +
+                                transform.right * networkInputData.movementInput.x;
+            moveDirection.Normalize();
+
+            networkCharacterControllerPrototypeCustom.Move(moveDirection, false);
+
+            //Jump
+            if (networkInputData.isJumpPressed)
+                networkCharacterControllerPrototypeCustom.Jump();
+
+            var walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
+                networkCharacterControllerPrototypeCustom.Velocity.z);
+            walkVector.Normalize();
+
+            walkSpeed = Mathf.Lerp(walkSpeed, Mathf.Clamp01(walkVector.magnitude), Runner.DeltaTime * 5);
+
+            if (characterAnimator != null)
+            {
+                characterAnimator.SetFloat("walkSpeed", walkSpeed);
+            }
+        }
+
     }
 
     private void DriveRobot(NetworkInputData networkInputData)
     {
         // Berechne die gewünschte Position basierend auf dem Zielobjekt und dem Offset
-        Vector3 desiredPosition = robotSeat.position;
+        var desiredPosition = robotSeat.position;
 
         // Verwende Lerp, um die Position allmählich an die gewünschte Position anzunähern
-        Vector3 smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSeatSpeed);
+        var smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSeatSpeed);
 
         // Aktualisiere die Position des Objekts
         transform.position = smoothedPosition;
@@ -131,8 +144,8 @@ public class CharacterMovementHandler : NetworkBehaviour
             if (!robotHandler.robotInGround)
             {
                 //Move
-                Vector3 moveDirection = robotSeat.transform.forward * networkInputData.movementInput.y +
-                                        robotSeat.transform.right * networkInputData.movementInput.x;
+                var moveDirection = robotSeat.transform.forward * networkInputData.movementInput.y +
+                                    robotSeat.transform.right * networkInputData.movementInput.x;
                 moveDirection.Normalize();
 
                 networkCharacterControllerPrototypeCustom.Move(moveDirection, true);
@@ -162,7 +175,7 @@ public class CharacterMovementHandler : NetworkBehaviour
                     networkCharacterControllerPrototypeCustom.Jump();
 
 
-                Vector2 walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
+                var walkVector = new Vector2(networkCharacterControllerPrototypeCustom.Velocity.x,
                     networkCharacterControllerPrototypeCustom.Velocity.z);
                 walkVector.Normalize();
 
@@ -219,16 +232,19 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
 
     public void SetCharacterMode(
-        NetworkCharacterControllerPrototypeCustom newNetworkCharacterControllerPrototypeCustom, Transform newRobotSeat)
+        NetworkCharacterControllerPrototypeCustom newNetworkCharacterControllerPrototypeCustom, Transform newRobotSeat, Transform newExitPoint)
     {
         if (newNetworkCharacterControllerPrototypeCustom == null) //DriveMode
         {
             if (newRobotSeat == null) //GunnerMode?
             {
                 inDrivingMode = false;
+                inGunnerMode = false;
                 networkCharacterControllerPrototypeCustom = transform.GetComponent<NetworkCharacterControllerPrototypeCustom>();
                 robot = null;
                 robotHandler = null;
+                exitSeat = true;
+                exitPoint = newExitPoint;
             }
             else //GunnerMode!
             {

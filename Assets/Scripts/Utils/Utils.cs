@@ -11,7 +11,7 @@ public static class Utils
 
     public static void SetRenderLayerInChildren(Transform transform, int layerNumber)
     {
-        foreach (Transform trans in transform.GetComponentsInChildren<Transform>(true))
+        foreach (var trans in transform.GetComponentsInChildren<Transform>(true))
         {
             if (trans.CompareTag("IgnoreLayerChange"))
                 continue;

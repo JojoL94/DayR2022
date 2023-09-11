@@ -31,7 +31,7 @@ public class SessionListUIHandler : MonoBehaviour
     public void AddToList(SessionInfo sessionInfo)
     {
         //Add a new item to the list
-        SessionInfoListUIItem addedSessionInfoListUIItem = Instantiate(sessionItemListPrefab, verticalLayoutGroup.transform).GetComponent<SessionInfoListUIItem>();
+        var addedSessionInfoListUIItem = Instantiate(sessionItemListPrefab, verticalLayoutGroup.transform).GetComponent<SessionInfoListUIItem>();
 
         addedSessionInfoListUIItem.SetInformation(sessionInfo);
 
@@ -42,11 +42,11 @@ public class SessionListUIHandler : MonoBehaviour
 
     private void AddedSessionInfoListUIItem_OnJoinSession(SessionInfo sessionInfo)
     {
-        NetworkRunnerHandler networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
+        var networkRunnerHandler = FindObjectOfType<NetworkRunnerHandler>();
 
         networkRunnerHandler.JoinGame(sessionInfo);
 
-        MainMenuUIHandler mainMenuUIHandler = FindObjectOfType<MainMenuUIHandler>();
+        var mainMenuUIHandler = FindObjectOfType<MainMenuUIHandler>();
         mainMenuUIHandler.OnJoiningServer();
     }
 
