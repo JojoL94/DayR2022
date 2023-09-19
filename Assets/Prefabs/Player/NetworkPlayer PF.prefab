@@ -1210,6 +1210,7 @@ MonoBehaviour:
   rotationSpeed: 180
   viewUpDownRotationSpeed: 150
   _IsGrounded: 0
+  _LegsGrounded: 0
   _Velocity: {x: 0, y: 0, z: 0}
 --- !u!114 &8954754819099828064
 MonoBehaviour:

@@ -73,9 +73,6 @@ public class InteractionHandler : NetworkBehaviour
                 GetComponent<CharacterMovementHandler>().SetCharacterMode(
                     hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(),
                     hitinfo.Hitbox.gameObject.transform.GetChild(0), null);
-               
-                hitinfo.Hitbox.Root.GetComponent<RobotHandler>()
-                    .SetUpDriver(true);
             }
             else if (hitinfo.Hitbox.tag == "RobotGunner")
             {
@@ -97,10 +94,7 @@ public class InteractionHandler : NetworkBehaviour
                 GetComponent<CharacterMovementHandler>().SetCharacterMode(
                     null,
                     null, hitinfo.Hitbox.gameObject.transform);
-                
-                hitinfo.Hitbox.Root.GetComponent<RobotHandler>()
-                    .SetUpDriver(false);
-                
+ 
                 //Position ändern
             }
 

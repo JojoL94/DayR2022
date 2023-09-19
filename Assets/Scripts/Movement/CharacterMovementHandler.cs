@@ -10,6 +10,7 @@ public class CharacterMovementHandler : NetworkBehaviour
     bool isRespawnRequested = false;
 
     private bool exitSeat;
+    private bool entrySeat;
     private Transform exitPoint;
     private bool inDrivingMode;
     private bool inGunnerMode;
@@ -54,7 +55,7 @@ public class CharacterMovementHandler : NetworkBehaviour
             if (hpHandler.isDead)
                 return;
         }
-        
+
         //Get the input from the network
         if (GetInput(out NetworkInputData networkInputData))
         {
@@ -71,14 +72,30 @@ public class CharacterMovementHandler : NetworkBehaviour
             }
             else if (inGunnerMode)
             {
-                // Berechne die gewünschte Position basierend auf dem Zielobjekt und dem Offset
-                var desiredPosition = robotSeat.position;
+                if (entrySeat)
+                {
+                    transform.position = Vector3.MoveTowards(transform.position, robotSeat.position, Runner.DeltaTime * 3f);
+                    if (Vector3.Distance(transform.position, robotSeat.position) < 0.2f)
+                    {
+                        if (inDrivingMode)
+                        {
+                            robotHandler.SetUpDriver(true);
+                        }
+                        entrySeat = false;
+                    }
+                }
+                else
+                {
+                    // Berechne die gewünschte Position basierend auf dem Zielobjekt und dem Offset
+                    var desiredPosition = robotSeat.position;
 
-                // Verwende Lerp, um die Position allmählich an die gewünschte Position anzunähern
-                var smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSeatSpeed);
+                    // Verwende Lerp, um die Position allmählich an die gewünschte Position anzunähern
+                    var smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSeatSpeed);
 
-                // Aktualisiere die Position des Objekts
-                transform.position = smoothedPosition;
+                    // Aktualisiere die Position des Objekts
+                    transform.position = smoothedPosition;
+                }
+
             }
             else
             {
@@ -125,23 +142,37 @@ public class CharacterMovementHandler : NetworkBehaviour
                 characterAnimator.SetFloat("walkSpeed", walkSpeed);
             }
         }
-
     }
 
     private void DriveRobot(NetworkInputData networkInputData)
     {
-        // Berechne die gewünschte Position basierend auf dem Zielobjekt und dem Offset
-        var desiredPosition = robotSeat.position;
+        if (entrySeat)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, robotSeat.position, Runner.DeltaTime * 3f);
+            if (Vector3.Distance(transform.position, robotSeat.position) < 0.2f)
+            {
+                if (inDrivingMode)
+                {
+                    robotHandler.SetUpDriver(true);
+                }
+                entrySeat = false;
+            }
+        }
+        else
+        {
+            // Berechne die gewünschte Position basierend auf dem Zielobjekt und dem Offset
+            var desiredPosition = robotSeat.position;
 
-        // Verwende Lerp, um die Position allmählich an die gewünschte Position anzunähern
-        var smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSeatSpeed);
+            // Verwende Lerp, um die Position allmählich an die gewünschte Position anzunähern
+            var smoothedPosition = Vector3.Lerp(transform.position, desiredPosition, smoothSeatSpeed);
 
-        // Aktualisiere die Position des Objekts
-        transform.position = smoothedPosition;
+            // Aktualisiere die Position des Objekts
+            transform.position = smoothedPosition;
+        }
 
         if (!robotHandler.isRobotFalling)
         {
-            if (!robotHandler.robotInGround)
+            if (!robotHandler.robotInGround && !entrySeat)
             {
                 //Move
                 var moveDirection = robotSeat.transform.forward * networkInputData.movementInput.y +
@@ -232,23 +263,31 @@ public class CharacterMovementHandler : NetworkBehaviour
     }
 
     public void SetCharacterMode(
-        NetworkCharacterControllerPrototypeCustom newNetworkCharacterControllerPrototypeCustom, Transform newRobotSeat, Transform newExitPoint)
+        NetworkCharacterControllerPrototypeCustom newNetworkCharacterControllerPrototypeCustom, Transform newRobotSeat,
+        Transform newExitPoint)
     {
-        if (newNetworkCharacterControllerPrototypeCustom == null) //DriveMode
+        if (newNetworkCharacterControllerPrototypeCustom == null)
         {
-            if (newRobotSeat == null) //GunnerMode?
+            if (newRobotSeat == null) //ExitMode!
             {
+                if (inDrivingMode)
+                {
+                    robotHandler.SetUpDriver(false);
+                }
                 inDrivingMode = false;
                 inGunnerMode = false;
-                networkCharacterControllerPrototypeCustom = transform.GetComponent<NetworkCharacterControllerPrototypeCustom>();
+                networkCharacterControllerPrototypeCustom =
+                    transform.GetComponent<NetworkCharacterControllerPrototypeCustom>();
                 robot = null;
                 robotHandler = null;
                 exitSeat = true;
+                entrySeat = false;
                 exitPoint = newExitPoint;
             }
             else //GunnerMode!
             {
                 robotSeat = newRobotSeat;
+                entrySeat = true;
                 inDrivingMode = false;
                 inGunnerMode = true;
             }
@@ -256,11 +295,11 @@ public class CharacterMovementHandler : NetworkBehaviour
         else //DriveMode
         {
             inDrivingMode = true;
+            entrySeat = true;
             networkCharacterControllerPrototypeCustom = newNetworkCharacterControllerPrototypeCustom;
             robotSeat = newRobotSeat;
             robot = robotSeat.root.transform;
             robotHandler = robot.GetComponent<RobotHandler>();
         }
-
     }
 }

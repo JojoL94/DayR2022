@@ -11,6 +11,7 @@ public class RobotHandler : NetworkBehaviour
     public List<Transform> measurementPoints = new List<Transform>();
     private Vector3Smoother smootherHeight = new Vector3Smoother(10); // Du kannst die Fenstergröße anpassen.
     private Vector3Smoother smootherNormal = new Vector3Smoother(10); // Du kannst die Fenstergröße anpassen.
+    private Vector3Smoother smootherRotationOffset = new Vector3Smoother(10); // Du kannst die Fenstergröße anpassen.
 
     //Driver info
     PlayerRef driverIsPlayerRef;
@@ -34,21 +35,23 @@ public class RobotHandler : NetworkBehaviour
     private float doorSpeed = 5f;
     private float moveSpeed = 10f;
 
+    private float smoothingRotationFactor = 0.2f;
     public float robotYOffset;
     private bool movingUp;
-    private float minHeight = 2f;
-    private float maxHeight = 4f;
+    public float minHeight = 2.2f;
+    public float maxHeight = 3.8f;
     private float heightValue;
     private Vector3 targetHeight;
     private Vector2 oldPositon;
     private Vector3 targetOnGround;
 
-    private float smoothingHeightFactor = 0.7f; // Anpassbare Glättungsfaktor
+    private float smoothingHeightFactor = 0.8f; // Anpassbare Glättungsfaktor
     private Vector3 rotationOffset;
-    private float rotationSpeed = 2f;
-    private float rotationOffsetValue = 15f;
+    private float rotationSpeed = 4f;
+    private float rotationOffsetValue = 20f;
 
     private NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
+
 
     public void Start()
     {
@@ -66,44 +69,43 @@ public class RobotHandler : NetworkBehaviour
     //Network update
     public override void FixedUpdateNetwork()
     {
-
         DoorProcess();
+
         float hitDistance = 50;
         var averageNormal = Vector3.zero;
         if (Object.HasStateAuthority)
         {
             var averagePosition = Vector3.zero;
 
-        foreach (var point in measurementPoints)
-        {
-            RaycastHit hit;
-            if (!Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer)) continue;
-            averageNormal += hit.normal;
-            averagePosition += hit.point;
-        }
+            foreach (var point in measurementPoints)
+            {
+                RaycastHit hit;
+                if (!Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer)) continue;
+                averageNormal += hit.normal;
+                averagePosition += hit.point;
+            }
 
-        averagePosition /= measurementPoints.Count;
-        var currentPosition = new Vector2(transform.position.x, transform.position.z);
-        if (currentPosition != oldPositon)
-        {
-            RotateRobotMotion(averageNormal);
-            oldPositon = transform.position;
-        }
-        if (!engineOn)
-        {
-            GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
-        }
-        else
-        {
-            // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
-            targetHeightValue = Mathf.Clamp(targetHeightValue, minHeight, maxHeight);
-            heightValue = Mathf.Lerp(heightValue, targetHeightValue, smoothingHeightFactor);
-            heightValue = Mathf.Clamp(heightValue, minHeight, maxHeight);
+            averagePosition /= measurementPoints.Count;
+            var currentPosition = new Vector2(transform.position.x, transform.position.z);
+            if (currentPosition != oldPositon)
+            {
+                RotateRobotMotion(averageNormal);
+                oldPositon = transform.position;
+            }
 
-            HeightRobotMotion(averagePosition.y + robotYOffset, heightValue - robotYOffset);
-        }
+            if (!engineOn)
+            {
+                GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
+            }
+            else
+            {
+                // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
+                targetHeightValue = Mathf.Clamp(targetHeightValue, minHeight, maxHeight);
+                heightValue = Mathf.Lerp(heightValue, targetHeightValue, smoothingHeightFactor);
+                heightValue = Mathf.Clamp(heightValue, minHeight, maxHeight);
 
-      
+                HeightRobotMotion(averagePosition.y + robotYOffset, heightValue - robotYOffset);
+            }
         }
     }
 
@@ -141,24 +143,43 @@ public class RobotHandler : NetworkBehaviour
         else
         {
             RaycastHit hit;
-            if (Physics.Raycast(measurementPoints[0].position + Vector3.up * 20f, Vector3.down, out hit, Mathf.Infinity, groundLayer))
+            if (Physics.Raycast(measurementPoints[0].position + Vector3.up * 20f, Vector3.down, out hit, Mathf.Infinity,
+                    groundLayer))
             {
-                if (Vector3.Distance(transform.position,new Vector3(transform.position.x,hit.point.y - robotYOffset/2,transform.position.z)) < 0.3f)
+                if (Vector3.Distance(transform.position,
+                        new Vector3(transform.position.x, hit.point.y - robotYOffset / 2, transform.position.z)) < 0.3f)
                 {
                     robotInGround = false;
                 }
                 else
                 {
                     transform.position =
-                        Vector3.MoveTowards(transform.position,  new Vector3(transform.position.x,hit.point.y - robotYOffset/2,transform.position.z), Runner.DeltaTime * moveSpeed / 2);
+                        Vector3.MoveTowards(transform.position,
+                            new Vector3(transform.position.x, hit.point.y - robotYOffset / 2, transform.position.z),
+                            Runner.DeltaTime * moveSpeed / 2);
                 }
             }
-
         }
     }
 
     private void RotateRobotMotion(Vector3 averageNormal)
     {
+
+        if (engineOn)
+        {
+            var smoothedRotationOffset = smootherRotationOffset.Smooth(rotationOffset);
+            var targetRotationOffset =
+                Quaternion.FromToRotation(transform.up, smoothedRotationOffset) * transform.rotation;
+            
+            // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
+            if (Quaternion.Angle(transform.rotation, targetRotationOffset) > rotationThreshold)
+            {
+                // Objekt so ausrichten, dass die Up-Richtung der durchschnittlichen Oberflächennormalen entspricht
+                transform.rotation =
+                    Quaternion.Lerp(transform.rotation, targetRotationOffset, Runner.DeltaTime * smoothingRotationFactor);
+            }
+        }
+
         if (measurementPoints.Count > 0)
         {
             averageNormal /= measurementPoints.Count;
@@ -171,20 +192,8 @@ public class RobotHandler : NetworkBehaviour
             {
                 // Objekt so ausrichten, dass die Up-Richtung der durchschnittlichen Oberflächennormalen entspricht
                 transform.rotation =
-                    Quaternion.Lerp(transform.rotation, targetRotation, Runner.DeltaTime * rotationSpeed);
-            }
-        }
-
-        if (engineOn)
-        {
-            var targetRotationOffset =
-                Quaternion.FromToRotation(transform.up, rotationOffset) * transform.rotation;
-            // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
-            if (Quaternion.Angle(transform.rotation, targetRotationOffset) > rotationThreshold)
-            {
-                // Objekt so ausrichten, dass die Up-Richtung der durchschnittlichen Oberflächennormalen entspricht
-                transform.rotation =
-                    Quaternion.Lerp(transform.rotation, targetRotationOffset, Runner.DeltaTime * (rotationSpeed / 20));
+                    Quaternion.Lerp(transform.rotation, targetRotation,
+                        Runner.DeltaTime * rotationSpeed);
             }
         }
     }
