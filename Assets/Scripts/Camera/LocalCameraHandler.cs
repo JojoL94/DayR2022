@@ -40,7 +40,7 @@ public class LocalCameraHandler : MonoBehaviour
     void Start()
     {
         initialRotationSpeed = 1.0f;
-        accelerationFactor = 0.1f;
+        accelerationFactor = 0.9f;
         rotationDelay = 5f;
         cameraRotationX = GameManager.instance.cameraViewRotation.x;
         cameraRotationY = GameManager.instance.cameraViewRotation.y;
@@ -65,9 +65,10 @@ public class LocalCameraHandler : MonoBehaviour
         cameraRotationX = Mathf.Clamp(cameraRotationX, -90, 90);
         if (inDrivingMode)
         {
+            
             var targetRotation = driverSeat.root.rotation;
             var currentRotation = transform.rotation;
-
+/*
             // Berechne die Differenz zwischen den Rotationen
             var rotationDifference = Quaternion.Inverse(currentRotation) * targetRotation;
 
@@ -78,7 +79,7 @@ public class LocalCameraHandler : MonoBehaviour
             currentRotationSpeed =
                 Mathf.Min(currentRotationSpeed + angleDifference * accelerationFactor,
                     localNetworkCharacterControllerPrototypeCustom.rotationSpeed - rotationDelay);
-
+*/
             // Maus-Input für die zusätzliche Rotation
             cameraRotationY += viewInput.x * Time.deltaTime *
                                localNetworkCharacterControllerPrototypeCustom.rotationSpeed;
@@ -88,8 +89,8 @@ public class LocalCameraHandler : MonoBehaviour
             var newRotation = targetRotation * mouseRotation;
 
             // Drehe das Objekt
-            transform.rotation =
-                Quaternion.RotateTowards(currentRotation, newRotation, currentRotationSpeed * Time.deltaTime);
+            transform.rotation = newRotation;
+
         }
         else
         {

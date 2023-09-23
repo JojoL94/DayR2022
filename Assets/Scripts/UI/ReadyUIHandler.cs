@@ -12,7 +12,7 @@ public class ReadyUIHandler : NetworkBehaviour
     public TextMeshProUGUI buttonRobotSpawnText;
     public TextMeshProUGUI countDownText;
     public NetworkObject robotPrefab;
-    public NetworkObject robot;
+
     public Button robotCustomizeButton0;
     public Button robotCustomizeButton1;
     public Button robotCustomizeButton2;
@@ -27,21 +27,13 @@ public class ReadyUIHandler : NetworkBehaviour
 
     [Networked(OnChanged = nameof(OnCountdownChanged))]
     byte countDown { get; set; }
-
-    [Networked] public bool robotAllreadySpawned { get; set; }
+    
+    [Networked] private NetworkObject robot{ get; set; }
 
     // Start is called before the first frame update
     void Start()
     {
         countDownText.text = "";
-        robotCustomizeButton0.enabled = false;
-        robotCustomizeButton1.enabled = false;
-        robotCustomizeButton2.enabled = false;
-        robotCustomizeButton3.enabled = false;
-        if (robotAllreadySpawned)
-        {
-            robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
-        }
     }
 
     void Update()
@@ -133,34 +125,12 @@ public class ReadyUIHandler : NetworkBehaviour
         if (isReady)
             return;
 
-        if (!robotAllreadySpawned)
+        if (robot == null)
         {
-            Debug.Log("Roboter soll gespawned werden");
-            robot = Runner.Spawn(robotPrefab,
-                NetworkPlayer.Local.transform.position + NetworkPlayer.Local.transform.forward * -15f,
-                Quaternion.identity, null,
-                (runner, spawnedRobot) =>
-                {
- 
-                });
-            
-            if (robot != null)
-            {
-                robotCustomizeButton0.enabled = true;
-                robotCustomizeButton1.enabled = true;
-                robotCustomizeButton2.enabled = true;
-                robotCustomizeButton3.enabled = true;
-                buttonRobotSpawnText.text = "--";
-                robotAllreadySpawned = true;
-            }
+            SpawnRobot();
         }
         else
         {
-            robot = GameObject.FindGameObjectWithTag("Robot").GetComponent<NetworkObject>();
-            robotCustomizeButton0.enabled = true;
-            robotCustomizeButton1.enabled = true;
-            robotCustomizeButton2.enabled = true;
-            robotCustomizeButton3.enabled = true;
             buttonRobotSpawnText.text = "--";
         }
     }
@@ -169,7 +139,7 @@ public class ReadyUIHandler : NetworkBehaviour
     {
         if (isReady)
             return;
-
+        SpawnRobot();
         robot.GetComponent<RobotCustomizerHandler>().OnCycleKanone();
     }
 
@@ -177,7 +147,7 @@ public class ReadyUIHandler : NetworkBehaviour
     {
         if (isReady)
             return;
-
+        SpawnRobot();
         robot.GetComponent<RobotCustomizerHandler>().OnCycleHuelle();
     }
 
@@ -185,7 +155,7 @@ public class ReadyUIHandler : NetworkBehaviour
     {
         if (isReady)
             return;
-
+        SpawnRobot();
         robot.GetComponent<RobotCustomizerHandler>().OnCycleInterior();
     }
 
@@ -193,12 +163,13 @@ public class ReadyUIHandler : NetworkBehaviour
     {
         if (isReady)
             return;
-
+        SpawnRobot();
         robot.GetComponent<RobotCustomizerHandler>().OnCycleLeg();
     }
 
     public void OnReady()
     {
+        SpawnRobot();
         if (isReady)
             isReady = false;
         else isReady = true;
@@ -232,5 +203,23 @@ public class ReadyUIHandler : NetworkBehaviour
         if (countDown == 0)
             countDownText.text = $"";
         else countDownText.text = $"Game starts in {countDown}";
+    }
+
+    void SpawnRobot()
+    {
+        if (robot == null)
+        {
+            RPC_SpawnRobot();
+        }
+    }
+
+    [Rpc(RpcSources.All, RpcTargets.All)]
+    void RPC_SpawnRobot()
+    {
+        Debug.Log("Roboter soll gespawned werden");
+        robot = Runner.Spawn(robotPrefab,
+            NetworkPlayer.Local.transform.position + NetworkPlayer.Local.transform.forward * -15f,
+            Quaternion.identity, null,
+            (runner, spawnedRobot) => { });
     }
 }

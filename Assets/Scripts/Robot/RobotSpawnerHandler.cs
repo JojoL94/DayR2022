@@ -1,18 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
+using Fusion;
 using UnityEngine;
 
-public class RobotSpawnerHandler : MonoBehaviour
+public class RobotSpawnerHandler : NetworkBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public NetworkObject robotPrefab;
+
+    [Networked] private NetworkObject robot { get; set; }
+
+    public override void Spawned()
     {
-        
+        if (Object.HasStateAuthority)
+        {
+            RPC_SpawnRobot();
+        }
     }
 
-    // Update is called once per frame
-    void Update()
+    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.StateAuthority)]
+    void RPC_SpawnRobot()
     {
-        
+        if (Object.HasStateAuthority)
+        {
+            Debug.Log("Roboter soll gespawned werden");
+            robot = Runner.Spawn(robotPrefab,
+                transform.position,
+                Quaternion.identity, null,
+                (runner, spawnedRobot) => { });
+        }
     }
 }

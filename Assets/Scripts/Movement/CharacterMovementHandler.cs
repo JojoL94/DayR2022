@@ -11,6 +11,7 @@ public class CharacterMovementHandler : NetworkBehaviour
 
     private bool exitSeat;
     private bool entrySeat;
+    private bool exitDriveMode;
     private Transform exitPoint;
     private bool inDrivingMode;
     private bool inGunnerMode;
@@ -116,6 +117,13 @@ public class CharacterMovementHandler : NetworkBehaviour
             if (Vector3.Distance(transform.position, exitPoint.position) < 0.2f)
             {
                 exitSeat = false;
+                if (exitDriveMode)
+                {
+                    robotHandler.SetUpDriver(false);
+                    robot = null;
+                    robotHandler = null;
+                    exitDriveMode = false;
+                }
             }
         }
         else
@@ -272,14 +280,18 @@ public class CharacterMovementHandler : NetworkBehaviour
             {
                 if (inDrivingMode)
                 {
-                    robotHandler.SetUpDriver(false);
+                    exitDriveMode = true;
+                }
+                else
+                {
+                    robot = null;
+                    robotHandler = null;
                 }
                 inDrivingMode = false;
                 inGunnerMode = false;
                 networkCharacterControllerPrototypeCustom =
                     transform.GetComponent<NetworkCharacterControllerPrototypeCustom>();
-                robot = null;
-                robotHandler = null;
+
                 exitSeat = true;
                 entrySeat = false;
                 exitPoint = newExitPoint;
@@ -302,4 +314,5 @@ public class CharacterMovementHandler : NetworkBehaviour
             robotHandler = robot.GetComponent<RobotHandler>();
         }
     }
+
 }

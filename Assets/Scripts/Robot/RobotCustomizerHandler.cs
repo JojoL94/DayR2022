@@ -20,7 +20,9 @@ public class RobotCustomizerHandler : NetworkBehaviour
     [SerializeField] List<GameObject> huellePrefabs = new List<GameObject>();
     [SerializeField] List<GameObject> interiorPrefabs = new List<GameObject>();
     [SerializeField] List<GameObject> legPrefabs = new List<GameObject>();
-
+    [Networked(OnChanged = nameof(OnRobotPartsChanged))]
+    NetworkRobotParts networkRobotParts { get; set; }
+    
     struct NetworkRobotParts : INetworkStruct
     {
         public byte kanonePrefabID;
@@ -28,10 +30,7 @@ public class RobotCustomizerHandler : NetworkBehaviour
         public byte interiorPrefabID;
         public byte legPrefabID;
     }
-
-    [Networked(OnChanged = nameof(OnRobotPartsChanged))]
-    NetworkRobotParts networkRobotParts { get; set; }
-
+    
     private void Awake()
     {
         // Load all kanonen and sort them
