@@ -40,7 +40,7 @@ public class RobotHandler : NetworkBehaviour
     private float rotationSpeed = 4f;
     private float rotationOffsetValue = 20f;
 
-    
+
     public float robotYOffset;
     private bool movingUp;
     public float minHeight = 2.2f;
@@ -54,6 +54,9 @@ public class RobotHandler : NetworkBehaviour
 
     private NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
 
+    private Terrain terrain;
+    private float hoverHeight = 0.5f; // Schwebehöhe über dem Terrain
+    private float smoothness = 5f; // Smoothness für die Höhenanpassung
 
     public void Start()
     {
@@ -65,6 +68,7 @@ public class RobotHandler : NetworkBehaviour
         rotationOffset = Vector3.zero;
         robotYOffset = GetComponent<CharacterController>().center.y;
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
+        terrain = Terrain.activeTerrain;
     }
 
 
@@ -114,72 +118,98 @@ public class RobotHandler : NetworkBehaviour
 
     public void HeightRobotMotion(float averageYPosition, float targetHeightAboveGround)
     {
-        if (!robotInGround)
+        // Stelle sicher, dass das Terrain vorhanden ist
+        if (terrain == null)
         {
-            RaycastHit hit;
-            if (Physics.Raycast(
-                    new Vector3(transform.position.x, averageYPosition + targetHeightAboveGround, transform.position.z),
-                    Vector3.down, out hit, groundLayer))
+            Debug.LogError("Terrain not found!");
+            if (!robotInGround)
             {
-                if (Vector3.Distance(hit.point, measurementPoints[0].position) > maxHeight + 0.3f)
+                RaycastHit hit;
+                if (Physics.Raycast(
+                        new Vector3(transform.position.x, averageYPosition + targetHeightAboveGround,
+                            transform.position.z),
+                        Vector3.down, out hit, groundLayer))
                 {
-                    isRobotFalling = true;
+                    if (Vector3.Distance(hit.point, measurementPoints[0].position) > maxHeight + 0.3f)
+                    {
+                        isRobotFalling = true;
+                    }
+                    else
+                    {
+                        isRobotFalling = false;
+
+                        var newYPosition = hit.point.y + targetHeightAboveGround;
+
+                        // Bewege das Objekt zur vorgegebenen Höhe über dem Boden (nur Y-Komponente ändern)
+                        var newPosition = new Vector3(transform.position.x, newYPosition, transform.position.z);
+                        var smoothedNewPosition = smootherHeight.Smooth(newPosition);
+                        transform.position = Vector3.MoveTowards(transform.position, smoothedNewPosition,
+                            Runner.DeltaTime * moveSpeed);
+                    }
                 }
-                else
+                else // Ist unter der Erde
                 {
-                    isRobotFalling = false;
-
-                    var newYPosition = hit.point.y + targetHeightAboveGround;
-
-                    // Bewege das Objekt zur vorgegebenen Höhe über dem Boden (nur Y-Komponente ändern)
-                    var newPosition = new Vector3(transform.position.x, newYPosition, transform.position.z);
-                    var smoothedNewPosition = smootherHeight.Smooth(newPosition);
-                    transform.position = Vector3.MoveTowards(transform.position, smoothedNewPosition,
-                        Runner.DeltaTime * moveSpeed);
+                    robotInGround = true;
                 }
             }
-            else // Ist unter der Erde
+            else
             {
-                robotInGround = true;
+                RaycastHit hit;
+                if (Physics.Raycast(measurementPoints[0].position + Vector3.up * 20f, Vector3.down, out hit,
+                        Mathf.Infinity,
+                        groundLayer))
+                {
+                    if (Vector3.Distance(transform.position,
+                            new Vector3(transform.position.x, hit.point.y - robotYOffset / 2,
+                                transform.position.z)) < 0.3f)
+                    {
+                        robotInGround = false;
+                    }
+                    else
+                    {
+                        transform.position =
+                            Vector3.MoveTowards(transform.position,
+                                new Vector3(transform.position.x, hit.point.y - robotYOffset / 2,
+                                    transform.position.z),
+                                Runner.DeltaTime * moveSpeed / 2);
+                    }
+                }
             }
         }
         else
         {
-            RaycastHit hit;
-            if (Physics.Raycast(measurementPoints[0].position + Vector3.up * 20f, Vector3.down, out hit, Mathf.Infinity,
-                    groundLayer))
-            {
-                if (Vector3.Distance(transform.position,
-                        new Vector3(transform.position.x, hit.point.y - robotYOffset / 2, transform.position.z)) < 0.3f)
-                {
-                    robotInGround = false;
-                }
-                else
-                {
-                    transform.position =
-                        Vector3.MoveTowards(transform.position,
-                            new Vector3(transform.position.x, hit.point.y - robotYOffset / 2, transform.position.z),
-                            Runner.DeltaTime * moveSpeed / 2);
-                }
-            }
+            // Aktuelle Position des Objekts
+            Vector3 objectPosition = transform.position;
+
+            // Berechne die Höhe des Terrains an der aktuellen Position des Objekts
+            float terrainHeight = terrain.SampleHeight(objectPosition);
+
+            // Berechne die Zielhöhe des Objekts über dem Boden
+            float targetHeight = terrainHeight + targetHeightAboveGround - 4f;
+
+            // Interpoliere die Höhe des Objekts, um ein sanftes Anpassen der Höhe zu ermöglichen
+            float smoothedHeight = Mathf.Lerp(objectPosition.y, targetHeight, Runner.DeltaTime * smoothness);
+
+            // Setze die Position des Objekts auf die berechnete Höhe
+            transform.position = new Vector3(objectPosition.x, smoothedHeight + hoverHeight, objectPosition.z);
         }
     }
 
     private void RotateRobotMotion(Vector3 averageNormal)
     {
-
         if (engineOn)
         {
             var smoothedRotationOffset = smootherRotationOffset.Smooth(rotationOffset);
             var targetRotationOffset =
                 Quaternion.FromToRotation(transform.up, smoothedRotationOffset) * transform.rotation;
-            
+
             // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
             if (Quaternion.Angle(transform.rotation, targetRotationOffset) > rotationThreshold)
             {
                 // Objekt so ausrichten, dass die Up-Richtung der durchschnittlichen Oberflächennormalen entspricht
                 transform.rotation =
-                    Quaternion.Lerp(transform.rotation, targetRotationOffset, Runner.DeltaTime * smoothingRotationFactor);
+                    Quaternion.Lerp(transform.rotation, targetRotationOffset,
+                        Runner.DeltaTime * smoothingRotationFactor);
             }
         }
 
