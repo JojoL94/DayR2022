@@ -36,6 +36,11 @@ public class RobotHandler : NetworkBehaviour
     private float moveSpeed = 10f;
 
     private float smoothingRotationFactor = 0.2f;
+    private Vector3 rotationOffset;
+    private float rotationSpeed = 4f;
+    private float rotationOffsetValue = 20f;
+
+    
     public float robotYOffset;
     private bool movingUp;
     public float minHeight = 2.2f;
@@ -46,9 +51,6 @@ public class RobotHandler : NetworkBehaviour
     private Vector3 targetOnGround;
 
     private float smoothingHeightFactor = 0.8f; // Anpassbare Glättungsfaktor
-    private Vector3 rotationOffset;
-    private float rotationSpeed = 4f;
-    private float rotationOffsetValue = 20f;
 
     private NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
 
@@ -72,9 +74,10 @@ public class RobotHandler : NetworkBehaviour
         DoorProcess();
 
         float hitDistance = 50;
-        var averageNormal = Vector3.zero;
+
         if (Object.HasStateAuthority)
         {
+            var averageNormal = Vector3.zero;
             var averagePosition = Vector3.zero;
 
             foreach (var point in measurementPoints)
@@ -90,7 +93,7 @@ public class RobotHandler : NetworkBehaviour
             if (currentPosition != oldPositon)
             {
                 RotateRobotMotion(averageNormal);
-                oldPositon = transform.position;
+                oldPositon = new Vector2(transform.position.x, transform.position.z);
             }
 
             if (!engineOn)

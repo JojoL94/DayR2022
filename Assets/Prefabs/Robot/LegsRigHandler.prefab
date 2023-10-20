@@ -788,7 +788,7 @@ MonoBehaviour:
   m_Data:
     m_Root: {fileID: 6608592910846051962}
     m_Mid: {fileID: 926330004768292044}
-    m_Tip: {fileID: 2840772962791252552}
+    m_Tip: {fileID: 8559005139717897185}
     m_Target: {fileID: 6816350544608216923}
     m_Hint: {fileID: 1609142081204986611}
     m_TargetPositionWeight: 1
@@ -1895,7 +1895,7 @@ MonoBehaviour:
   m_Data:
     m_Root: {fileID: 2479001741277210682}
     m_Mid: {fileID: 8665574297401007139}
-    m_Tip: {fileID: 4494656671315988230}
+    m_Tip: {fileID: 269937278324274376}
     m_Target: {fileID: 3808736991734002956}
     m_Hint: {fileID: 8037788777658177897}
     m_TargetPositionWeight: 1
@@ -2206,7 +2206,7 @@ MonoBehaviour:
   m_Data:
     m_Root: {fileID: 4446499306565395956}
     m_Mid: {fileID: 9213557973189238371}
-    m_Tip: {fileID: 1505395616720560943}
+    m_Tip: {fileID: 4005769919430721794}
     m_Target: {fileID: 696927556155310759}
     m_Hint: {fileID: 6043666441756225714}
     m_TargetPositionWeight: 1
@@ -2360,7 +2360,7 @@ MonoBehaviour:
   m_Data:
     m_Root: {fileID: 5731126727020480237}
     m_Mid: {fileID: 2947762118755651353}
-    m_Tip: {fileID: 6439334758124871853}
+    m_Tip: {fileID: 8305194088356885064}
     m_Target: {fileID: 2020245722896538476}
     m_Hint: {fileID: 6528507847947005511}
     m_TargetPositionWeight: 1
