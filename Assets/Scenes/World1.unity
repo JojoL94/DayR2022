@@ -206,28 +206,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d44d8e8dc119b7643b88f6c518f47a60, type: 3}
---- !u!1 &38668663 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 60962148583301591, guid: 4c348d38970e9394a9fbf0093a4ca750,
-    type: 3}
-  m_PrefabInstance: {fileID: 4228910587159493809}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &38668670
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 38668663}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f496f741dd315ed41b0649a957a3f634, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  WordOffset: 0
-  WordCount: 0
-  _interpolationDataSource: 0
-  moveSpeed: 2
 --- !u!1 &203844586
 GameObject:
   m_ObjectHideFlags: 0
@@ -1217,16 +1195,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3937562054467863712, guid: 4c348d38970e9394a9fbf0093a4ca750,
         type: 3}
-      propertyPath: NetworkedBehaviours.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3937562054467863712, guid: 4c348d38970e9394a9fbf0093a4ca750,
-        type: 3}
-      propertyPath: NetworkedBehaviours.Array.data[1]
-      value: 
-      objectReference: {fileID: 38668670}
-    - target: {fileID: 3937562054467863712, guid: 4c348d38970e9394a9fbf0093a4ca750,
-        type: 3}
       propertyPath: NetworkGuid.RawGuidValue.Array.data[0]
       value: -3583038902129954303
       objectReference: {fileID: 0}
@@ -1285,19 +1253,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 8494757124075123546, guid: 4c348d38970e9394a9fbf0093a4ca750,
-        type: 3}
-      propertyPath: m_ProvidesContacts
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 60962148583301591, guid: 4c348d38970e9394a9fbf0093a4ca750,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 38668670}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 4c348d38970e9394a9fbf0093a4ca750, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

@@ -43,8 +43,8 @@ public class RobotHandler : NetworkBehaviour
 
     public float robotYOffset;
     private bool movingUp;
-    public float minHeight = 2.2f;
-    public float maxHeight = 3.8f;
+    public float minHeight = 2f;
+    public float maxHeight = 3.2f;
     private float heightValue;
     private Vector3 targetHeight;
     private Vector2 oldPositon;
@@ -55,6 +55,7 @@ public class RobotHandler : NetworkBehaviour
     private NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
 
     private Terrain terrain;
+    private TerrainData terrainData;
     private float hoverHeight = 0.5f; // Schwebehöhe über dem Terrain
     private float smoothness = 5f; // Smoothness für die Höhenanpassung
 
@@ -66,9 +67,10 @@ public class RobotHandler : NetworkBehaviour
         CollectAllMeasurementPoints(measurementPoints[0]);
         oldPositon = new Vector2(transform.position.x, transform.position.z);
         rotationOffset = Vector3.zero;
-        robotYOffset = GetComponent<CharacterController>().center.y;
+        robotYOffset = GetComponent<CharacterController>().center.y *2;
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         terrain = Terrain.activeTerrain;
+        terrainData = terrain.terrainData;
     }
 
 
@@ -77,48 +79,60 @@ public class RobotHandler : NetworkBehaviour
     {
         DoorProcess();
 
-        float hitDistance = 50;
+        //float hitDistance = 50;
 
         if (Object.HasStateAuthority)
         {
-            var averageNormal = Vector3.zero;
-            var averagePosition = Vector3.zero;
 
-            foreach (var point in measurementPoints)
-            {
-                RaycastHit hit;
-                if (!Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer)) continue;
-                averageNormal += hit.normal;
-                averagePosition += hit.point;
-            }
 
-            averagePosition /= measurementPoints.Count;
             var currentPosition = new Vector2(transform.position.x, transform.position.z);
             if (currentPosition != oldPositon)
             {
-                RotateRobotMotion(averageNormal);
                 oldPositon = new Vector2(transform.position.x, transform.position.z);
             }
+
 
             if (!engineOn)
             {
                 GetComponent<NetworkCharacterControllerPrototypeCustom>().Move(Vector3.zero, false);
+                var averageNormal = Vector3.zero;
+
+                foreach (var point in measurementPoints)
+                {
+                    RaycastHit hit;
+                    if (!Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer)) continue;
+                    averageNormal += hit.normal;
+                }
             }
             else
             {
+                var averageNormal = Vector3.zero;
+                float averageTerrainHeight = 0;
+                foreach (var point in measurementPoints)
+                {
+                    RaycastHit hit;
+                    if (!Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer)) continue;
+                    averageNormal += hit.normal;
+                    // Berechne die Höhe des Terrains an der aktuellen Position des Objekts
+                    float terrainHeight = terrain.SampleHeight(point.position);
+                    averageTerrainHeight += terrainHeight;
+                }
+
+                averageTerrainHeight /= measurementPoints.Count;
                 // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
                 targetHeightValue = Mathf.Clamp(targetHeightValue, minHeight, maxHeight);
                 heightValue = Mathf.Lerp(heightValue, targetHeightValue, smoothingHeightFactor);
                 heightValue = Mathf.Clamp(heightValue, minHeight, maxHeight);
 
-                HeightRobotMotion(averagePosition.y + robotYOffset, heightValue - robotYOffset);
+                RotateRobotMotion(averageNormal);
+                HeightRobotMotion(averageTerrainHeight, heightValue - robotYOffset);
             }
         }
     }
 
-    public void HeightRobotMotion(float averageYPosition, float targetHeightAboveGround)
+    public void HeightRobotMotion(float averageTerrainHeight, float targetHeightAboveGround)
     {
-        // Stelle sicher, dass das Terrain vorhanden ist
+        /*// Stelle sicher, dass das Terrain vorhanden ist
         if (terrain == null)
         {
             Debug.LogError("Terrain not found!");
@@ -192,7 +206,19 @@ public class RobotHandler : NetworkBehaviour
 
             // Setze die Position des Objekts auf die berechnete Höhe
             transform.position = new Vector3(objectPosition.x, smoothedHeight + hoverHeight, objectPosition.z);
-        }
+        }*/
+
+        // Aktuelle Position des Objekts
+        Vector3 objectPosition = transform.position;
+        
+        // Berechne die Zielhöhe des Objekts über dem Boden
+        float targetHeight = averageTerrainHeight + targetHeightAboveGround;
+
+        // Interpoliere die Höhe des Objekts, um ein sanftes Anpassen der Höhe zu ermöglichen
+        float smoothedHeight = Mathf.Lerp(objectPosition.y, targetHeight, Runner.DeltaTime * smoothness);
+
+        // Setze die Position des Objekts auf die berechnete Höhe
+        transform.position = new Vector3(objectPosition.x, smoothedHeight + hoverHeight, objectPosition.z);
     }
 
     private void RotateRobotMotion(Vector3 averageNormal)
@@ -391,14 +417,7 @@ public class RobotHandler : NetworkBehaviour
 
         engineOn = newEngineOn;
     }
-
-    [Rpc(RpcSources.All, RpcTargets.All)]
-    public void RPC_DriverChangeRequest(PlayerRef newDriverPlayerRef, String newDriverPlayerName)
-    {
-        driverIsPlayerRef = newDriverPlayerRef;
-        driverIsPlayerName = newDriverPlayerName;
-    }
-
+    
     public void SetUpDriver(bool engineOn)
     {
         RPC_EngineRequest(engineOn);
