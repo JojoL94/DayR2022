@@ -45,6 +45,7 @@ public class LegTargetHandler : NetworkBehaviour
     private bool isInDefaultPosition;
     private Vector3 targetHit;
     //Timing
+    private TickTimer stepTimer = TickTimer.None;
     private bool isTimerRunning = false;
     private float timerDefaultPositionDuration = 2.5f;
     private float timerStartTime;
@@ -82,6 +83,8 @@ public class LegTargetHandler : NetworkBehaviour
                     neighborLegHandlerBF.blockedByNeighborBF = true;
                     makeStep = true;
                     isInDefaultPosition = false;
+                    //moveSpeed = defaultMoveSpeed/2;
+                    stepTimer = TickTimer.CreateFromSeconds(Runner, 2);
                 }
                 // Der Timer ist abgelaufen, setze den Bool-Wert auf false.
                 isTimerRunning = false;
@@ -160,6 +163,8 @@ public class LegTargetHandler : NetworkBehaviour
                     neighborLegHandlerBF.blockedByNeighborBF = true;
                     makeStep = true;
                     isInDefaultPosition = false;
+                    //moveSpeed = defaultMoveSpeed;
+                    stepTimer = TickTimer.CreateFromSeconds(Runner, 2);
                 }
                 else if
                     (distancePointTarget > stepDistance * 4) //Kontrolle ob sich das Target am Arsch der Welt befindet
