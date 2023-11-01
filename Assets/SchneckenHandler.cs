@@ -18,7 +18,7 @@ public class SchneckenHandler : NetworkBehaviour
     private float rotationSpeed = 4f;
     private float targetHeightAboveGround = 1;
 
-    public float moveSpeed = 3.0f; // Die gewünschte Geschwindigkeit
+    public float moveSpeed = 2.0f; // Die gewünschte Geschwindigkeit
     
     private Terrain terrain;
     private float desiredHeight = -4f; // Gewünschte Höhe über dem Boden

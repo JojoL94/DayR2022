@@ -224,10 +224,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f496f741dd315ed41b0649a957a3f634, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  WordOffset: 0
-  WordCount: 0
   _interpolationDataSource: 0
-  moveSpeed: 2
+  moveSpeed: 5
 --- !u!1 &203844586
 GameObject:
   m_ObjectHideFlags: 0
@@ -1218,7 +1216,7 @@ PrefabInstance:
     - target: {fileID: 3937562054467863712, guid: 4c348d38970e9394a9fbf0093a4ca750,
         type: 3}
       propertyPath: NetworkedBehaviours.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 3937562054467863712, guid: 4c348d38970e9394a9fbf0093a4ca750,
         type: 3}
@@ -1283,11 +1281,6 @@ PrefabInstance:
     - target: {fileID: 8203646746206699006, guid: 4c348d38970e9394a9fbf0093a4ca750,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8494757124075123546, guid: 4c348d38970e9394a9fbf0093a4ca750,
-        type: 3}
-      propertyPath: m_ProvidesContacts
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
