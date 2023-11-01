@@ -67,7 +67,7 @@ public class RobotHandler : NetworkBehaviour
         CollectAllMeasurementPoints(measurementPoints[0]);
         oldPositon = new Vector2(transform.position.x, transform.position.z);
         rotationOffset = Vector3.zero;
-        robotYOffset = GetComponent<CharacterController>().center.y *2;
+        robotYOffset = GetComponent<CharacterController>().center.y * 2;
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
         terrain = Terrain.activeTerrain;
         terrainData = terrain.terrainData;
@@ -83,8 +83,6 @@ public class RobotHandler : NetworkBehaviour
 
         if (Object.HasStateAuthority)
         {
-
-
             var currentPosition = new Vector2(transform.position.x, transform.position.z);
             if (currentPosition != oldPositon)
             {
@@ -108,17 +106,21 @@ public class RobotHandler : NetworkBehaviour
             {
                 var averageNormal = Vector3.zero;
                 float averageTerrainHeight = 0;
+                int counterPoint = 0;
                 foreach (var point in measurementPoints)
                 {
                     RaycastHit hit;
-                    if (!Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer)) continue;
-                    averageNormal += hit.normal;
+                    if (Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer))
+                    {
+                        averageNormal += hit.normal;
+                        counterPoint++;
+                    }
                     // Berechne die Höhe des Terrains an der aktuellen Position des Objekts
-                    float terrainHeight = terrain.SampleHeight(point.position);
-                    averageTerrainHeight += terrainHeight;
+                    averageTerrainHeight += terrain.SampleHeight(point.position);
                 }
 
                 averageTerrainHeight /= measurementPoints.Count;
+                averageNormal /= counterPoint;
                 // Begrenze den Float-Wert innerhalb des angegebenen Bereichs
                 targetHeightValue = Mathf.Clamp(targetHeightValue, minHeight, maxHeight);
                 heightValue = Mathf.Lerp(heightValue, targetHeightValue, smoothingHeightFactor);
@@ -207,18 +209,14 @@ public class RobotHandler : NetworkBehaviour
             // Setze die Position des Objekts auf die berechnete Höhe
             transform.position = new Vector3(objectPosition.x, smoothedHeight + hoverHeight, objectPosition.z);
         }*/
+        float tmpTerrainHeight = terrain.SampleHeight(transform.position);
 
-        // Aktuelle Position des Objekts
-        Vector3 objectPosition = transform.position;
-        
         // Berechne die Zielhöhe des Objekts über dem Boden
-        float targetHeight = averageTerrainHeight + targetHeightAboveGround;
+        float targetHeight = tmpTerrainHeight + averageTerrainHeight + targetHeightAboveGround;
 
-        // Interpoliere die Höhe des Objekts, um ein sanftes Anpassen der Höhe zu ermöglichen
-        float smoothedHeight = Mathf.Lerp(objectPosition.y, targetHeight, Runner.DeltaTime * smoothness);
-
-        // Setze die Position des Objekts auf die berechnete Höhe
-        transform.position = new Vector3(objectPosition.x, smoothedHeight + hoverHeight, objectPosition.z);
+        transform.position = Vector3.MoveTowards(transform.position,
+            new Vector3(transform.position.x, targetHeight, transform.position.z),
+            Runner.DeltaTime * 10);
     }
 
     private void RotateRobotMotion(Vector3 averageNormal)
@@ -241,7 +239,6 @@ public class RobotHandler : NetworkBehaviour
 
         if (measurementPoints.Count > 0)
         {
-            averageNormal /= measurementPoints.Count;
             averageNormal.Normalize();
             var smoothedAverageNormal = smootherNormal.Smooth(averageNormal);
             var targetRotation =
@@ -408,7 +405,7 @@ public class RobotHandler : NetworkBehaviour
     {
         if (newEngineOn)
         {
-            GetComponent<CharacterController>().center = new Vector3(0, 10, 0);
+            GetComponent<CharacterController>().center = new Vector3(0, 0, 0);
         }
         else
         {
@@ -417,7 +414,7 @@ public class RobotHandler : NetworkBehaviour
 
         engineOn = newEngineOn;
     }
-    
+
     public void SetUpDriver(bool engineOn)
     {
         RPC_EngineRequest(engineOn);
