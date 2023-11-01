@@ -763,8 +763,8 @@ MonoBehaviour:
   openedMarker: {fileID: 0}
   doorTargetPosition: {fileID: 0}
   robotYOffset: 0
-  minHeight: 1.7
-  maxHeight: 3
+  minHeight: 2
+  maxHeight: 3.5
 --- !u!114 &-458774806603130930
 MonoBehaviour:
   m_ObjectHideFlags: 0

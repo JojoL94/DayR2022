@@ -128,7 +128,6 @@ MonoBehaviour:
   measurementPoints:
   - {fileID: 981331306944285417}
   rotationThreshold: 0.1
-  moveSpeed: 2
 --- !u!114 &3937562054467863712
 MonoBehaviour:
   m_ObjectHideFlags: 0
