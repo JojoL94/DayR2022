@@ -40,7 +40,7 @@ public class RobotHandler : NetworkBehaviour
     private float rotationSpeed = 4f;
     private float rotationOffsetValue = 20f;
 
-    
+
     public float robotYOffset;
     private bool movingUp;
     public float minHeight = 2.2f;
@@ -55,6 +55,11 @@ public class RobotHandler : NetworkBehaviour
     private NetworkCharacterControllerPrototypeCustom networkCharacterControllerPrototypeCustom;
 
 
+    [SerializeField] private Terrain terrain;
+    private float hoverHeight = 0.5f; // Schwebehöhe über dem Terrain
+    private float smoothness = 5f; // Smoothness für die Höhenanpassung
+    [SerializeField] private float tmpSampleHeight;
+
     public void Start()
     {
         closedMarker = transform.GetChild(1).GetChild(0).GetChild(0).transform;
@@ -65,6 +70,8 @@ public class RobotHandler : NetworkBehaviour
         rotationOffset = Vector3.zero;
         robotYOffset = GetComponent<CharacterController>().center.y;
         networkCharacterControllerPrototypeCustom = GetComponent<NetworkCharacterControllerPrototypeCustom>();
+
+        terrain = Terrain.activeTerrain;
     }
 
 
@@ -79,16 +86,30 @@ public class RobotHandler : NetworkBehaviour
         {
             var averageNormal = Vector3.zero;
             var averagePosition = Vector3.zero;
+            float tmpMinTerrainHeight = 0;
+            int countMeasurementPoints = 0;
 
             foreach (var point in measurementPoints)
             {
                 RaycastHit hit;
+                tmpSampleHeight = terrain.SampleHeight(point.position);
+                
+                if (tmpMinTerrainHeight < tmpSampleHeight || tmpMinTerrainHeight == 0)
+                {
+                    tmpMinTerrainHeight = tmpSampleHeight;
+                }
+
+                if (tmpMinTerrainHeight < minHeight / 2)
+                {
+                    robotInGround = true;
+                }
                 if (!Physics.Raycast(point.position, Vector3.down, out hit, Mathf.Infinity, groundLayer)) continue;
                 averageNormal += hit.normal;
                 averagePosition += hit.point;
+                countMeasurementPoints++;
             }
 
-            averagePosition /= measurementPoints.Count;
+            averagePosition /= countMeasurementPoints;
             var currentPosition = new Vector2(transform.position.x, transform.position.z);
             if (currentPosition != oldPositon)
             {
@@ -116,6 +137,8 @@ public class RobotHandler : NetworkBehaviour
     {
         if (!robotInGround)
         {
+            
+
             RaycastHit hit;
             if (Physics.Raycast(
                     new Vector3(transform.position.x, averageYPosition + targetHeightAboveGround, transform.position.z),
@@ -163,23 +186,39 @@ public class RobotHandler : NetworkBehaviour
                 }
             }
         }
+/*
+        // Aktuelle Position des Objekts
+        Vector3 objectPosition = transform.position;
+
+        // Berechne die Höhe des Terrains an der aktuellen Position des Objekts
+        float terrainHeight = terrain.SampleHeight(objectPosition);
+
+        // Berechne die Zielhöhe des Objekts über dem Boden
+        float targetHeight = terrainHeight + targetHeightAboveGround - 4f;
+
+        // Interpoliere die Höhe des Objekts, um ein sanftes Anpassen der Höhe zu ermöglichen
+        float smoothedHeight = Mathf.Lerp(objectPosition.y, targetHeight, Runner.DeltaTime * smoothness);
+
+        // Setze die Position des Objekts auf die berechnete Höhe
+        transform.position = new Vector3(objectPosition.x, smoothedHeight + hoverHeight, objectPosition.z);
+        */
     }
 
     private void RotateRobotMotion(Vector3 averageNormal)
     {
-
         if (engineOn)
         {
             var smoothedRotationOffset = smootherRotationOffset.Smooth(rotationOffset);
             var targetRotationOffset =
                 Quaternion.FromToRotation(transform.up, smoothedRotationOffset) * transform.rotation;
-            
+
             // Überprüfen, ob die Differenz zwischen aktueller Rotation und Zielrotation den Schwellenwert überschreitet
             if (Quaternion.Angle(transform.rotation, targetRotationOffset) > rotationThreshold)
             {
                 // Objekt so ausrichten, dass die Up-Richtung der durchschnittlichen Oberflächennormalen entspricht
                 transform.rotation =
-                    Quaternion.Lerp(transform.rotation, targetRotationOffset, Runner.DeltaTime * smoothingRotationFactor);
+                    Quaternion.Lerp(transform.rotation, targetRotationOffset,
+                        Runner.DeltaTime * smoothingRotationFactor);
             }
         }
 
