@@ -42,6 +42,7 @@ public class LegTargetHandler : NetworkBehaviour
     private float offsetAmount = 0.7f; // Der Offset in Laufrichtung
 
     private bool middleStep;
+    private float middleStepHeight = 2f;
     private bool isInDefaultPosition;
     private Vector3 targetHit;
     //Timing
@@ -53,6 +54,9 @@ public class LegTargetHandler : NetworkBehaviour
     private float maxHeight;
     private float minHeight;
     
+    //TerrainHeight Parameter
+    private TerrainHeightFinder myTerrainHeightFinder;
+    
     private void Start()
     {
         networkCharacterControllerPrototypeCustom = transform.root.GetComponent<NetworkCharacterControllerPrototypeCustom>();
@@ -60,7 +64,7 @@ public class LegTargetHandler : NetworkBehaviour
         maxHeight = robotHandler.maxHeight;
         minHeight = robotHandler.minHeight;
         //defaultMoveSpeed = networkCharacterControllerPrototypeCustom.maxSpeed;
-
+        myTerrainHeightFinder = transform.root.GetComponent<TerrainHeightFinder>();
     }
     
 
@@ -184,7 +188,7 @@ public class LegTargetHandler : NetworkBehaviour
 */
                 if (middleStep)
                 {
-                    middleStepMarker = new Vector3(transform.position.x, (transform.position.y + targetHit.y) / 2,
+                    middleStepMarker = new Vector3(transform.position.x, myTerrainHeightFinder.GetTerrainHeightAtPosition(transform.position) + middleStepHeight,
                         transform.position.z);
                     target.position =
                         Vector3.MoveTowards(target.position, middleStepMarker, moveSpeed * Time.deltaTime);

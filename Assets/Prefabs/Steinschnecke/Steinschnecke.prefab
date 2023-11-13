@@ -14,6 +14,8 @@ GameObject:
   - component: {fileID: 8494757124075123546}
   - component: {fileID: 6923563664724088958}
   - component: {fileID: 3937562054467863712}
+  - component: {fileID: 6492133385237670040}
+  - component: {fileID: 73977846118051982}
   m_Layer: 0
   m_Name: Steinschnecke
   m_TagString: Untagged
@@ -128,6 +130,7 @@ MonoBehaviour:
   measurementPoints:
   - {fileID: 981331306944285417}
   rotationThreshold: 0.1
+  moveSpeed: 3
 --- !u!114 &3937562054467863712
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -151,7 +154,36 @@ MonoBehaviour:
   NestedObjects: []
   NetworkedBehaviours:
   - {fileID: 6923563664724088958}
+  - {fileID: 6492133385237670040}
   SimulationBehaviours: []
+--- !u!114 &6492133385237670040
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 60962148583301591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f496f741dd315ed41b0649a957a3f634, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
+  moveSpeed: 5
+--- !u!114 &73977846118051982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 60962148583301591}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ce3387c064c59a4a86345819e6e1425, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  terrains: []
+  currentTerrainHeight: 0
 --- !u!1 &235568561055099235
 GameObject:
   m_ObjectHideFlags: 0

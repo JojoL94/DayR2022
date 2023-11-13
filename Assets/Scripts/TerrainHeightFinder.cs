@@ -1,8 +1,16 @@
+using System;
 using UnityEngine;
 
 public class TerrainHeightFinder : MonoBehaviour
 {
     public Terrain[] terrains; // Liste aller Terrains
+    public float currentTerrainHeight;
+
+    private void Start()
+    {
+        // Finde alle Terrains im Spiel und speichere sie im 'terrains'-Array
+        terrains = Terrain.activeTerrains;
+    }
 
     public float GetTerrainHeightAtPosition(Vector3 position)
     {
@@ -10,23 +18,19 @@ public class TerrainHeightFinder : MonoBehaviour
 
         foreach (Terrain terrain in terrains)
         {
-            // Prüfen, ob die Position innerhalb des aktuellen Terrains liegt
-            if (position.x >= terrain.transform.position.x && position.x <= terrain.transform.position.x + terrain.terrainData.size.x &&
-                position.z >= terrain.transform.position.z && position.z <= terrain.transform.position.z + terrain.terrainData.size.z)
+            // Konvertiere die Position in die lokale Koordinaten des Terrains
+            Vector3 terrainLocalPosition = position - terrain.transform.position;
+
+            // Berechne die Höhe des Terrains an der Position des Objekts
+            currentTerrainHeight = terrain.SampleHeight(position);
+            if (currentTerrainHeight > terrainHeight)
             {
-                // Position auf die lokale Position des Terrains umrechnen
-                Vector3 localPosition = position - terrain.transform.position;
-
-                // Höhe des Terrains an der lokalen Position erhalten
-                float height = terrain.SampleHeight(localPosition);
-
-                // Wenn die Höhe größer als die bisherige gefunden Höhe ist, aktualisieren
-                if (height > terrainHeight)
-                {
-                    terrainHeight = height;
-                }
+                terrainHeight = currentTerrainHeight;
             }
+            // Zeige die Höhe in der Konsole an (kann entfernt werden, wenn nicht benötigt)
+            //Debug.Log("Höhe des Terrains: " + terrainHeight);
         }
+
 
         return terrainHeight;
     }

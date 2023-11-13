@@ -591,6 +591,7 @@ GameObject:
   - component: {fileID: 9214645184098993898}
   - component: {fileID: 7390023408258365724}
   - component: {fileID: -458774806603130930}
+  - component: {fileID: 4326141999427120823}
   m_Layer: 0
   m_Name: RobotBlockoutTexturiert
   m_TagString: Robot
@@ -763,8 +764,10 @@ MonoBehaviour:
   openedMarker: {fileID: 0}
   doorTargetPosition: {fileID: 0}
   robotYOffset: 0
-  minHeight: 2
-  maxHeight: 3.5
+  minHeight: 0
+  maxHeight: 2.8
+  smoothedHeight: 0
+  zeroRobotHeight: 0
 --- !u!114 &-458774806603130930
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -786,6 +789,20 @@ MonoBehaviour:
   huellePrefabs: []
   interiorPrefabs: []
   legPrefabs: []
+--- !u!114 &4326141999427120823
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7114915075156089524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ce3387c064c59a4a86345819e6e1425, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  terrains: []
+  currentTerrainHeight: 0
 --- !u!1 &7437938524600549068
 GameObject:
   m_ObjectHideFlags: 0

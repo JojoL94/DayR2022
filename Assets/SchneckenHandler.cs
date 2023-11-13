@@ -20,15 +20,15 @@ public class SchneckenHandler : NetworkBehaviour
 
     public float moveSpeed = 2.0f; // Die gewünschte Geschwindigkeit
     
-    private Terrain terrain;
+
     private float desiredHeight = -4f; // Gewünschte Höhe über dem Boden
     private float hoverHeight = 0.5f; // Schwebehöhe über dem Terrain
     private float smoothness = 5f; // Smoothness für die Höhenanpassung
-
+    private TerrainHeightFinder myTerrainHeightFinder;
     public void Start()
     {
         CollectAllMeasurementPoints(measurementPoints[0]);
-        terrain = Terrain.activeTerrain;
+        myTerrainHeightFinder = GetComponent<TerrainHeightFinder>();
     }
 
     public override void FixedUpdateNetwork()
@@ -88,20 +88,13 @@ public class SchneckenHandler : NetworkBehaviour
 
             // Bewege das Objekt
             transform.position = newPosition + movement;
-            
-            
-            // Stelle sicher, dass das Terrain vorhanden ist
-            if (terrain == null)
-            {
-                Debug.LogError("Terrain not found!");
-                return;
-            }
+
 
             // Aktuelle Position des Objekts
             Vector3 objectPosition = transform.position;
 
             // Berechne die Höhe des Terrains an der aktuellen Position des Objekts
-            float terrainHeight = terrain.SampleHeight(objectPosition);
+            float terrainHeight = myTerrainHeightFinder.GetTerrainHeightAtPosition(objectPosition);
 
             // Berechne die Zielhöhe des Objekts über dem Boden
             float targetHeight = terrainHeight + desiredHeight;
