@@ -10,6 +10,7 @@ TagManager:
   - RobotDriver
   - RobotExit
   - RobotGunner
+  - RobotArmor
   layers:
   - Default
   - TransparentFX
