@@ -96,9 +96,6 @@ public class InteractionHandler : NetworkBehaviour
                     null, hitinfo.Hitbox.gameObject.transform);
  
                 //Position ändern
-            } else if (hitinfo.Hitbox.tag == "RobotLeg")
-            {
-                //RoboterLeg austauschen
             }
 
             if (Object.HasStateAuthority)
