@@ -155,6 +155,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 6923563664724088958}
   - {fileID: 6492133385237670040}
+  - {fileID: 73977846118051982}
   SimulationBehaviours: []
 --- !u!114 &6492133385237670040
 MonoBehaviour:
@@ -182,6 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce3387c064c59a4a86345819e6e1425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   terrains: []
   currentTerrainHeight: 0
 --- !u!1 &235568561055099235

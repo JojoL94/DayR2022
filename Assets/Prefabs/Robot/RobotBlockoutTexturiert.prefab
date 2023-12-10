@@ -1155,6 +1155,7 @@ MonoBehaviour:
   - {fileID: 9214645184098993898}
   - {fileID: 7390023408258365724}
   - {fileID: -458774806603130930}
+  - {fileID: 4326141999427120823}
   - {fileID: 3297283975213072760}
   - {fileID: 3372727800493359781}
   - {fileID: 7687608509048362766}
@@ -1247,6 +1248,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce3387c064c59a4a86345819e6e1425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   terrains: []
   currentTerrainHeight: 0
 --- !u!1 &7437938524600549068

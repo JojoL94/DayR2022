@@ -114,7 +114,6 @@ public class RobotCustomizerHandler : NetworkBehaviour
     private void OnRobotPartsChanged()
     {
         ReplaceRobotParts();
-
     }
 
 

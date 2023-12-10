@@ -104,10 +104,7 @@ public class InteractionHandler : NetworkBehaviour
 
                     //Position ändern
                 }
-
-                if (Object.HasStateAuthority)
-                {
-                }
+                
             }
             else
             {
@@ -123,6 +120,10 @@ public class InteractionHandler : NetworkBehaviour
                         objectToCarry = hit.transform.GameObject();
                         interactionBlocked = true;
                         objectToCarry.GetComponent<PickUpHandler>().PickUp(pickPosition);
+                        if (Object.HasStateAuthority)
+                        {
+                            objectToCarry.GetComponent<NetworkObject>().RequestStateAuthority();
+                        }
                         Debug.Log("Object to Carry" + objectToCarry);
                     }
                 }
