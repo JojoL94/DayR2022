@@ -67,7 +67,6 @@ public class LegTargetHandler : NetworkBehaviour
         myTerrainHeightFinder = transform.root.GetComponent<TerrainHeightFinder>();
     }
     
-
     void Update()
     {
 
@@ -180,12 +179,6 @@ public class LegTargetHandler : NetworkBehaviour
 
             if (makeStep)
             {
-                /*
-                if (stepTimer.Expired(Runner))
-                {
-                    middleStep = false;
-                }
-*/
                 if (middleStep)
                 {
                     middleStepMarker = new Vector3(transform.position.x, myTerrainHeightFinder.GetTerrainHeightAtPosition(transform.position) + middleStepHeight,
@@ -219,9 +212,6 @@ public class LegTargetHandler : NetworkBehaviour
             {
                 target.position = oldStepMarker;
             }
-
-            //hipTarget.position = target.position;
-
             if (Physics.Raycast(target.position + new Vector3(0, 10, 0), Vector3.down, out hit, Mathf.Infinity,
                     groundLayer))
             {

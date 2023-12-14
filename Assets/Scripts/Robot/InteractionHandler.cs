@@ -4,6 +4,7 @@ using ExitGames.Client.Photon.StructWrapping;
 using UnityEngine;
 using Fusion;
 using TMPro;
+using Unity.VisualScripting;
 
 public class InteractionHandler : NetworkBehaviour
 {
@@ -14,8 +15,14 @@ public class InteractionHandler : NetworkBehaviour
     LocalCameraHandler localCameraHandler;
     HPHandler hpHandler;
     NetworkPlayer networkPlayer;
+
     NetworkObject networkObject;
 
+    //Values for Object Carry
+    private bool interactionBlocked;
+    private GameObject objectToCarry;
+    [SerializeField] private Transform pickPosition;
+    
     [Networked(OnChanged = nameof(OnInteractChanged))]
     public bool isInteracting { get; set; }
 
@@ -43,78 +50,104 @@ public class InteractionHandler : NetworkBehaviour
 
     void Interact(Vector3 aimForwardVector)
     {
-        Debug.Log("Try Interact");
-        float hitDistance = 5;
-        Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, hitDistance, Object.InputAuthority,
-            out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority);
-
-        var isInteractableObject = false;
-
-        if (hitinfo.Distance > 0)
-            hitDistance = hitinfo.Distance;
-        if (hitinfo.Hitbox != null)
+        if (!interactionBlocked)
         {
-            Debug.Log($"{Time.time} {transform.name} hit hitbox {hitinfo.Hitbox.transform.root.name}");
+            Debug.Log("Try Interact");
+            float hitDistance = 5;
+            Runner.LagCompensation.Raycast(aimPoint.position, aimForwardVector, hitDistance, Object.InputAuthority,
+                out var hitinfo, collisionLayers, HitOptions.IgnoreInputAuthority);
 
+            var isInteractableObject = false;
 
-            isInteractableObject = true;
-            if (hitinfo.Hitbox.tag == "Door")
+            if (hitinfo.Distance > 0)
+                hitDistance = hitinfo.Distance;
+            if (hitinfo.Hitbox != null)
             {
-                hitinfo.Hitbox.transform.root.GetComponent<RobotHandler>().OpenCloseDoor();
-            }
-            else if (hitinfo.Hitbox.tag == "RobotDriver")
-            {
-
-                GetComponent<CharacterController>().enabled = false;
-                localCameraHandler.SetNetworkCharacterPrototypeCustom(
-                    hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
-                    hitinfo.Hitbox.gameObject.transform.GetChild(0));
-                
-                GetComponent<CharacterMovementHandler>().SetCharacterMode(
-                    hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(),
-                    hitinfo.Hitbox.gameObject.transform.GetChild(0), null);
-            }
-            else if (hitinfo.Hitbox.tag == "RobotGunner")
-            {
-                GetComponent<CharacterController>().enabled = false;
-               
-                localCameraHandler.SetNetworkCharacterPrototypeCustom(
-                    hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
-                    hitinfo.Hitbox.gameObject.transform.GetChild(0));
-                
-                GetComponent<CharacterMovementHandler>().SetCharacterMode(null, hitinfo.Hitbox.gameObject.transform.GetChild(0), null);
-            }
-            else if (hitinfo.Hitbox.tag == "RobotExit")
-            {
-                GetComponent<CharacterController>().enabled = true;
-                
-                localCameraHandler.SetNetworkCharacterPrototypeCustom(
-                    null, false,
-                    null);
-                GetComponent<CharacterMovementHandler>().SetCharacterMode(
-                    null,
-                    null, hitinfo.Hitbox.gameObject.transform);
- 
-                //Position ändern
-            }
-
-            if (Object.HasStateAuthority)
-            {
-            }
-        }
-
-        if (hitinfo.Collider != null)
-        {
-            if (Object.HasStateAuthority)
-            {
+                Debug.Log($"{Time.time} {transform.name} hit hitbox {hitinfo.Hitbox.transform.root.name}");
                 isInteractableObject = true;
-            }
-        }
+                if (hitinfo.Hitbox.tag == "Door")
+                {
+                    hitinfo.Hitbox.transform.root.GetComponent<RobotHandler>().OpenCloseDoor();
+                }
+                else if (hitinfo.Hitbox.tag == "RobotDriver")
+                {
+                    GetComponent<CharacterController>().enabled = false;
+                    localCameraHandler.SetNetworkCharacterPrototypeCustom(
+                        hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
+                        hitinfo.Hitbox.gameObject.transform.GetChild(0));
 
-        //Debug
-        if (isInteractableObject)
-            Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.red, 1);
-        else Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.green, 1);
+                    GetComponent<CharacterMovementHandler>().SetCharacterMode(
+                        hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(),
+                        hitinfo.Hitbox.gameObject.transform.GetChild(0), null);
+                }
+                else if (hitinfo.Hitbox.tag == "RobotGunner")
+                {
+                    GetComponent<CharacterController>().enabled = false;
+
+                    localCameraHandler.SetNetworkCharacterPrototypeCustom(
+                        hitinfo.Hitbox.Root.GetComponent<NetworkCharacterControllerPrototypeCustom>(), true,
+                        hitinfo.Hitbox.gameObject.transform.GetChild(0));
+
+                    GetComponent<CharacterMovementHandler>()
+                        .SetCharacterMode(null, hitinfo.Hitbox.gameObject.transform.GetChild(0), null);
+                }
+                else if (hitinfo.Hitbox.tag == "RobotExit")
+                {
+                    GetComponent<CharacterController>().enabled = true;
+
+                    localCameraHandler.SetNetworkCharacterPrototypeCustom(
+                        null, false,
+                        null);
+                    GetComponent<CharacterMovementHandler>().SetCharacterMode(
+                        null,
+                        null, hitinfo.Hitbox.gameObject.transform);
+
+                    //Position ändern
+                }
+                
+            }
+            else
+            {
+                RaycastHit hit;
+                // Erstelle einen Ray vom aktuellen Objekt in die angegebene Richtung
+                Ray ray = new Ray(transform.position, aimForwardVector);
+
+                // Führe den Raycast durch und überprüfe, ob etwas getroffen wurde
+                if (Physics.Raycast(ray, out hit, hitDistance))
+                {
+                    if (hit.transform.tag == "RobotArmor")
+                    {
+                        objectToCarry = hit.transform.GameObject();
+                        interactionBlocked = true;
+                        objectToCarry.GetComponent<PickUpHandler>().PickUp(pickPosition);
+                        if (Object.HasStateAuthority)
+                        {
+                            objectToCarry.GetComponent<NetworkObject>().RequestStateAuthority();
+                        }
+                        Debug.Log("Object to Carry" + objectToCarry);
+                    }
+                }
+            }
+
+            if (hitinfo.Collider != null)
+            {
+                if (Object.HasStateAuthority)
+                {
+                    isInteractableObject = true;
+                }
+            }
+
+            //Debug
+            if (isInteractableObject)
+                Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.red, 1);
+            else Debug.DrawRay(aimPoint.position, aimForwardVector * hitDistance, Color.green, 1);
+        }
+        else
+        {
+            interactionBlocked = false;
+            objectToCarry.GetComponent<PickUpHandler>().Drop();
+            objectToCarry = null;
+        }
     }
 
     IEnumerator InteractingEffectCO()

@@ -78,9 +78,9 @@ GameObject:
   - component: {fileID: 342899000023368242}
   - component: {fileID: 2216431161056990556}
   - component: {fileID: 4825927903351292644}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: RobotArmor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -550,9 +550,9 @@ GameObject:
   - component: {fileID: 5528258933451929606}
   - component: {fileID: 5663096052580043302}
   - component: {fileID: 8094242005164460083}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: RobotArmor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -928,9 +928,9 @@ GameObject:
   - component: {fileID: 6243075744827134549}
   - component: {fileID: 646364731579821045}
   - component: {fileID: 3868303309988020295}
-  m_Layer: 0
+  m_Layer: 9
   m_Name: Cube
-  m_TagString: Untagged
+  m_TagString: RobotArmor
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1155,6 +1155,7 @@ MonoBehaviour:
   - {fileID: 9214645184098993898}
   - {fileID: 7390023408258365724}
   - {fileID: -458774806603130930}
+  - {fileID: 4326141999427120823}
   - {fileID: 3297283975213072760}
   - {fileID: 3372727800493359781}
   - {fileID: 7687608509048362766}
@@ -1247,6 +1248,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5ce3387c064c59a4a86345819e6e1425, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _interpolationDataSource: 0
   terrains: []
   currentTerrainHeight: 0
 --- !u!1 &7437938524600549068

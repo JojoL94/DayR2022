@@ -1,7 +1,8 @@
 using System;
+using Fusion;
 using UnityEngine;
 
-public class TerrainHeightFinder : MonoBehaviour
+public class TerrainHeightFinder : NetworkBehaviour
 {
     public Terrain[] terrains; // Liste aller Terrains
     public float currentTerrainHeight;
@@ -30,7 +31,6 @@ public class TerrainHeightFinder : MonoBehaviour
             // Zeige die Höhe in der Konsole an (kann entfernt werden, wenn nicht benötigt)
             //Debug.Log("Höhe des Terrains: " + terrainHeight);
         }
-
 
         return terrainHeight;
     }
