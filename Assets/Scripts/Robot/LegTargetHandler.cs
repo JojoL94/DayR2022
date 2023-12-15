@@ -15,6 +15,8 @@ public class LegTargetHandler : NetworkBehaviour
     public Transform hipTarget;
     public bool makeStep;
 
+    private Transform tmpTarget;
+    
     private float
         defaultLegMoveSpeed = 15f; 
 
@@ -67,16 +69,15 @@ public class LegTargetHandler : NetworkBehaviour
         myTerrainHeightFinder = transform.root.GetComponent<TerrainHeightFinder>();
     }
     
-    void Update()
+    public override void FixedUpdateNetwork()
     {
-
         if (isTimerRunning)
         {
             float elapsedTime = Time.time - timerStartTime;
 
             if (elapsedTime >= timerDefaultPositionDuration)
             {
-                if (Vector3.Distance(target.position, new Vector3(transform.position.x, target.position.y, transform.position.z)) > 0.3f)
+                if (Vector3.Distance(tmpTarget.position, new Vector3(transform.position.x, tmpTarget.position.y, transform.position.z)) > 0.3f)
                 {
                     robotHandler.LegOffsetRotate(front,left,true);
                     oldRobotPosition = currentRobotPosition;
@@ -134,7 +135,7 @@ public class LegTargetHandler : NetworkBehaviour
         if (Physics.Raycast(transform.position, raycastDirection, out hit, Mathf.Infinity, groundLayer))
         {
             // Berechne den Wert zwischen 0 und 1, der die Position des Objekts zwischen minHeight und maxHeight repräsentiert
-            float t = Mathf.InverseLerp(minHeight, maxHeight, Vector3.Distance(transform.position, target.position));
+            float t = Mathf.InverseLerp(minHeight, maxHeight, Vector3.Distance(transform.position, tmpTarget.position));
 
             // Verwende Lerp, um die Geschwindigkeit basierend auf t zu interpolieren
             float moveSpeed = Mathf.Lerp(defaultLegMoveSpeed * 0.5f, defaultLegMoveSpeed, t); // Hier 0.5f, um die Geschwindigkeit am Mittelpunkt zu erhöhen
@@ -142,7 +143,7 @@ public class LegTargetHandler : NetworkBehaviour
             targetHit = Vector3.MoveTowards(targetHit, hit.point, 20f * Time.deltaTime);
             // Der Raycast hat den Boden getroffen
             Debug.DrawRay(transform.position, raycastDirection * raycastDistance, Color.green);
-            var distancePointTarget = Vector3.Distance(targetHit, target.position);
+            var distancePointTarget = Vector3.Distance(targetHit, tmpTarget.position);
             
             var inStepDistance = !(distancePointTarget > stepDistance);
             var makeStepBlocked = blockedByNeighborBF && blockedByNeighborLR;
@@ -173,7 +174,7 @@ public class LegTargetHandler : NetworkBehaviour
                     (distancePointTarget > stepDistance * 4) //Kontrolle ob sich das Target am Arsch der Welt befindet
                 {
                     targetHit = transform.position;
-                    target.position = transform.position;
+                    tmpTarget.position = transform.position;
                 }
             }
 
@@ -183,10 +184,10 @@ public class LegTargetHandler : NetworkBehaviour
                 {
                     middleStepMarker = new Vector3(transform.position.x, myTerrainHeightFinder.GetTerrainHeightAtPosition(transform.position) + middleStepHeight,
                         transform.position.z);
-                    target.position =
-                        Vector3.MoveTowards(target.position, middleStepMarker, moveSpeed * Time.deltaTime);
-
-                    if (Vector3.Distance(target.position, middleStepMarker) < 0.2f)
+                    tmpTarget.position =
+                        Vector3.MoveTowards(tmpTarget.position, middleStepMarker, moveSpeed * Runner.DeltaTime);
+                    
+                    if (Vector3.Distance(tmpTarget.position, middleStepMarker) < 0.2f)
                     {
                         middleStep = false;
                     }
@@ -194,11 +195,11 @@ public class LegTargetHandler : NetworkBehaviour
                 else
                 {
                     nextStepMarker = targetHit;
-                    target.position =
-                        Vector3.MoveTowards(target.position, nextStepMarker, moveSpeed * Time.deltaTime);
+                    tmpTarget.position =
+                        Vector3.MoveTowards(tmpTarget.position, nextStepMarker, moveSpeed * Runner.DeltaTime);
                 }
 
-                if (Vector3.Distance(nextStepMarker, target.position) < 0.1f)
+                if (Vector3.Distance(nextStepMarker, tmpTarget.position) < 0.1f)
                 {
                     oldStepMarker = nextStepMarker;
                     neighborLegHandlerLR.blockedByNeighborLR = false;
@@ -210,20 +211,20 @@ public class LegTargetHandler : NetworkBehaviour
             }
             else
             {
-                target.position = oldStepMarker;
+                tmpTarget.position = oldStepMarker;
             }
-            if (Physics.Raycast(target.position + new Vector3(0, 10, 0), Vector3.down, out hit, Mathf.Infinity,
+            if (Physics.Raycast(tmpTarget.position + new Vector3(0, 10, 0), Vector3.down, out hit, Mathf.Infinity,
                     groundLayer))
             {
-                hipTarget.position = target.position +
-                                     new Vector3(0, hipTargetValue - Vector3.Distance(target.position, hit.point), 0);
+                hipTarget.position = tmpTarget.position +
+                                     new Vector3(0, hipTargetValue - Vector3.Distance(tmpTarget.position, hit.point), 0);
                 Debug.DrawRay(transform.position,
                     (hipTarget.position - transform.position) *
                     Vector3.Distance(hipTarget.position, transform.position), Color.cyan);
             }
             else
             {
-                hipTarget.position = target.position + new Vector3(0, hipTargetValue, 0);
+                hipTarget.position = tmpTarget.position + new Vector3(0, hipTargetValue, 0);
             }
             
         }
@@ -234,6 +235,10 @@ public class LegTargetHandler : NetworkBehaviour
 
             // Hier kannst du weitere Aktionen ausführen, wenn der Raycast nichts trifft
         }
+
+        float moveSpeedMdf = Vector3.Distance(target.position, tmpTarget.position);
+        target.position =
+            Vector3.MoveTowards(tmpTarget.position, nextStepMarker, (moveSpeed + moveSpeedMdf) * Time.deltaTime);
     }
     
     public void StartTimer()
